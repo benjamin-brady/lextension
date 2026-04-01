@@ -8,7 +8,7 @@
 	const game = createGameState(puzzle);
 </script>
 
-<div class="grid gap-4">
+<div class="grid gap-2">
 	<HowToPlay />
 <GameBoard {game} {puzzleNumber} {puzzle} />
 </div>

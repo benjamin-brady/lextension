@@ -293,9 +293,9 @@
 	}
 
 	// Grid positioning helpers
-	const SLOT_SIZE = 112;
-	const NODE_SIZE = 88;
-	const GAP = 20;
+	const SLOT_SIZE = 92;
+	const NODE_SIZE = 72;
+	const GAP = 14;
 	const GRID_W = SLOT_SIZE * 3 + GAP * 2;
 	const GRID_H = SLOT_SIZE * 3 + GAP * 2;
 
@@ -314,7 +314,7 @@
 	ontouchend={onTouchEnd}
 />
 
-<div class="flex flex-col items-center gap-6 select-none">
+<div class="flex flex-col items-center gap-3 select-none touch-none">
 	<div class="grid w-full max-w-sm grid-cols-3 gap-3">
 		<div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
 			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Moves</p>
@@ -378,7 +378,7 @@
 			>
 				{#if cell}
 					<div
-						class="flex h-[88px] w-[88px] cursor-grab flex-col items-center justify-center gap-0.5 rounded-xl border-2 bg-[var(--surface-light)] transition-colors active:cursor-grabbing"
+						class="flex h-[72px] w-[72px] cursor-grab flex-col items-center justify-center gap-0.5 rounded-xl border-2 bg-[var(--surface-light)] transition-colors active:cursor-grabbing"
 						style="border-color: {nodeOutline(i)};"
 						role="button"
 						aria-label={`Move ${cell.word}`}
@@ -391,10 +391,10 @@
 						<span class="text-sm font-semibold">{cell.word}</span>
 					</div>
 				{:else if dragOverIndex === i}
-					<div class="flex h-[88px] w-[88px] items-center justify-center rounded-xl border-2 border-dashed border-[var(--accent)] bg-[var(--surface)] opacity-70"></div>
+					<div class="flex h-[72px] w-[72px] items-center justify-center rounded-xl border-2 border-dashed border-[var(--accent)] bg-[var(--surface)] opacity-70"></div>
 				{:else}
 					<div
-						class="h-[88px] w-[88px] rounded-xl border-2 bg-[var(--surface)] transition-colors"
+						class="h-[72px] w-[72px] rounded-xl border-2 bg-[var(--surface)] transition-colors"
 						style="border-color: {nodeOutline(i)};"
 					></div>
 				{/if}
@@ -427,7 +427,7 @@
 
 	<!-- Inventory -->
 	<div
-		class="flex flex-wrap justify-center gap-2 min-h-[60px] w-full p-3 rounded-xl bg-[var(--surface)] border border-[var(--border)]"
+		class="flex flex-wrap justify-center gap-2 min-h-[48px] w-full p-2 rounded-xl bg-[var(--surface)] border border-[var(--border)]"
 		data-inventory
 		role="list"
 		ondragover={(e) => {
