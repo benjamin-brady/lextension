@@ -15,55 +15,55 @@ export function createGameState(puzzle: Puzzle) {
 	let inventory = $state<WordItem[]>(shuffleArray([...puzzle.solution]));
 	let checks = $state(0);
 
-	/** Whether we are currently showing check results */
-	let checked = $state(false);
+	/** Per-cell: whether the cell has been checked and not changed since */
+	let cellChecked = $state<boolean[]>(Array(9).fill(false));
 
-	/** Snapshot of the grid at the time of last check (word strings) */
+	/** Snapshot of words at each cell at last check time */
 	let checkedSnapshot = $state<(string | null)[]>(Array(9).fill(null));
 
 	/** Whether the puzzle is complete and all correct */
-	let solved = $derived(checked && grid.every((cell, i) => {
+	let solved = $derived(cellChecked.every(Boolean) && grid.every((cell, i) => {
 		if (!cell) return false;
 		const correct = puzzle.solution[i];
 		return cell.word === correct.word;
 	}));
 
-	/** Number of correctly placed words (only meaningful when checked) */
+	/** Number of correctly placed words (only counts checked cells) */
 	let correctCount = $derived(
-		checked
-			? grid.reduce((acc, cell, i) => {
-				if (!cell) return acc;
-				return acc + (cell.word === puzzle.solution[i].word ? 1 : 0);
-			}, 0)
-			: 0
+		grid.reduce((acc, cell, i) => {
+			if (!cell || !cellChecked[i]) return acc;
+			return acc + (cell.word === puzzle.solution[i].word ? 1 : 0);
+		}, 0)
 	);
 
 	let correctEdgeCount = $derived(
-		checked
-			? puzzle.edges.reduce((acc, edge) => acc + (getRawEdgeStatus(edge.from, edge.to) === 'correct' ? 1 : 0), 0)
-			: 0
+		puzzle.edges.reduce((acc, edge) => acc + (getRawEdgeStatus(edge.from, edge.to) === 'correct' ? 1 : 0), 0)
 	);
 
-	/** Invalidate check results whenever the grid changes from the checked snapshot */
-	function markDirty() {
-		if (!checked) return;
-		const current = grid.map((c) => c?.word ?? null);
-		const changed = current.some((w, i) => w !== checkedSnapshot[i]);
-		if (changed) {
-			checked = false;
+	/** Mark specific cells as dirty when they change after a check */
+	function markCellsDirty(indices: number[]) {
+		for (const idx of indices) {
+			const current = grid[idx]?.word ?? null;
+			if (current !== checkedSnapshot[idx]) {
+				cellChecked[idx] = false;
+			}
 		}
 	}
 
 	function check() {
 		checks += 1;
-		checked = true;
+		cellChecked = Array(9).fill(true);
 		checkedSnapshot = grid.map((c) => c?.word ?? null);
+	}
+
+	function isCellChecked(index: number): boolean {
+		return cellChecked[index];
 	}
 
 	function getNodeStatus(index: number): NodeStatus {
 		const cell = grid[index];
 		if (!cell) return 'empty';
-		if (!checked) return 'unchecked';
+		if (!cellChecked[index]) return 'unchecked';
 		return cell.word === puzzle.solution[index].word ? 'correct' : 'wrong';
 	}
 
@@ -82,7 +82,7 @@ export function createGameState(puzzle: Puzzle) {
 		const fromCell = grid[fromIdx];
 		const toCell = grid[toIdx];
 		if (!fromCell || !toCell) return 'empty';
-		if (!checked) return 'empty';
+		if (!cellChecked[fromIdx] || !cellChecked[toIdx]) return 'empty';
 		return getRawEdgeStatus(fromIdx, toIdx);
 	}
 
@@ -107,7 +107,7 @@ export function createGameState(puzzle: Puzzle) {
 		inventory = inventory.filter((w) => w.word !== word.word);
 		// Place in grid
 		grid[gridIndex] = word;
-		markDirty();
+		markCellsDirty([gridIndex]);
 	}
 
 	function removeFromGrid(gridIndex: number) {
@@ -115,7 +115,7 @@ export function createGameState(puzzle: Puzzle) {
 		if (cell) {
 			inventory = [...inventory, cell];
 			grid[gridIndex] = null;
-			markDirty();
+			markCellsDirty([gridIndex]);
 		}
 	}
 
@@ -132,7 +132,7 @@ export function createGameState(puzzle: Puzzle) {
 		const target = grid[toIdx];
 		grid[toIdx] = source;
 		grid[fromIdx] = target ?? null;
-		markDirty();
+		markCellsDirty([fromIdx, toIdx]);
 	}
 
 	function swapGridCells(fromIdx: number, toIdx: number) {
@@ -145,7 +145,7 @@ export function createGameState(puzzle: Puzzle) {
 		inventory = shuffleArray([...puzzle.solution]);
 		grid = Array(9).fill(null);
 		checks = 0;
-		checked = false;
+		cellChecked = Array(9).fill(false);
 		checkedSnapshot = Array(9).fill(null);
 	}
 
@@ -156,10 +156,11 @@ export function createGameState(puzzle: Puzzle) {
 		get correctCount() { return correctCount; },
 		get correctEdgeCount() { return correctEdgeCount; },
 		get checks() { return checks; },
-		get checked() { return checked; },
+		get cellChecked() { return cellChecked; },
 		getNodeStatus,
 		getEdgeStatus,
 		getEdgeClue,
+		isCellChecked,
 		check,
 		placeWord,
 		removeFromGrid,

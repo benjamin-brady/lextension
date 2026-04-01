@@ -90,13 +90,14 @@
 			<div class="mt-5 grid gap-4 text-sm text-[var(--text)]">
 				<p class="leading-6 text-[var(--text-muted)]">
 					Drag the nine word tiles into the 3x3 grid so every connected pair has a valid relationship.
-					Links can be phrases, categories, sound-alikes, or wordplay, and a valid pair lights up green anywhere on the board.
+					Links can be phrases, categories, sound-alikes, or wordplay.
 				</p>
 
 				<div class="grid gap-2">
 					<p>Fill the grid by dragging words from the tray.</p>
 					<p>Rearrange by dragging a placed word to a new spot or back to the tray.</p>
-					<p>Use green links to find valid pairings, then finish by putting all nine words in the right positions.</p>
+					<p>Press <strong>Check</strong> to reveal which words and links are correct. Moving a tile resets the colors until you check again.</p>
+					<p>Try to solve it in as few checks as possible!</p>
 				</div>
 
 				<div class="grid gap-2">

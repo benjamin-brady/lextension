@@ -148,10 +148,15 @@
 	}
 
 	function shareRows(): string {
+		const statusForShare = (index: number) => {
+			const cell = game.grid[index];
+			if (!cell) return NODE_STATUS_EMOJI.empty;
+			if (!game.isCellChecked(index)) return NODE_STATUS_EMOJI.unchecked;
+			return NODE_STATUS_EMOJI[game.getNodeStatus(index)];
+		};
 		return Array.from({ length: 3 }, (_, rowIndex) => {
 			return Array.from({ length: 3 }, (_, colIndex) => {
-				const index = rowIndex * 3 + colIndex;
-				return NODE_STATUS_EMOJI[game.getNodeStatus(index)];
+				return statusForShare(rowIndex * 3 + colIndex);
 			}).join('');
 		}).join('\n');
 	}
