@@ -34,4 +34,4 @@ export const ADJACENCIES: [number, number][] = [
 ];
 
 export type EdgeStatus = 'correct' | 'wrong' | 'empty';
-export type NodeStatus = 'correct' | 'wrong' | 'empty';
+export type NodeStatus = 'correct' | 'wrong' | 'empty' | 'unchecked';

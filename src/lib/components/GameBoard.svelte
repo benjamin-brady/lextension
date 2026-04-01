@@ -15,7 +15,8 @@
 	const NODE_STATUS_EMOJI = {
 		correct: '🟩',
 		wrong: '🟥',
-		empty: '⬜'
+		empty: '⬜',
+		unchecked: '⬜'
 	} as const;
 
 	let draggedItem = $state<DragItem | null>(null);
@@ -157,8 +158,8 @@
 
 	function buildShareText() {
 		const statusLine = game.solved
-			? `Solved in ${game.moves} moves`
-			: `${game.correctCount}/9 words, ${game.correctEdgeCount}/${ADJACENCIES.length} links, ${game.moves} moves`;
+			? `Solved in ${game.checks} checks`
+			: `${game.correctCount}/9 words, ${game.correctEdgeCount}/${ADJACENCIES.length} links, ${game.checks} checks`;
 
 		const lines = [
 			`LexLink #${puzzleNumber}`,
@@ -288,6 +289,7 @@
 		switch (status) {
 			case 'correct': return 'var(--green)';
 			case 'wrong': return 'var(--border)';
+			case 'unchecked': return 'var(--border)';
 			default: return 'var(--border)';
 		}
 	}
@@ -317,8 +319,8 @@
 <div class="flex flex-col items-center gap-3 select-none touch-none">
 	<div class="grid w-full max-w-sm grid-cols-3 gap-3">
 		<div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Moves</p>
-			<p class="text-xl font-bold">{game.moves}</p>
+			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Checks</p>
+			<p class="text-xl font-bold">{game.checks}</p>
 		</div>
 		<div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
 			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Words</p>
@@ -458,6 +460,14 @@
 	</div>
 
 	<div class="flex items-center gap-3">
+		{#if !game.solved}
+			<button
+				class="px-5 py-2 text-sm font-semibold rounded-lg bg-[var(--accent)] text-white hover:opacity-90 transition-opacity cursor-pointer"
+				onclick={() => game.check()}
+			>
+				Check
+			</button>
+		{/if}
 		<button
 			class="px-4 py-2 text-sm rounded-lg bg-[var(--surface-light)] border border-[var(--border)] hover:border-[var(--accent)] transition-colors cursor-pointer"
 			onclick={shareResult}

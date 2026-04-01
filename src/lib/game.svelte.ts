@@ -13,36 +13,61 @@ export function createGameState(puzzle: Puzzle) {
 
 	/** Inventory: words not yet placed */
 	let inventory = $state<WordItem[]>(shuffleArray([...puzzle.solution]));
-	let moves = $state(0);
+	let checks = $state(0);
+
+	/** Whether we are currently showing check results */
+	let checked = $state(false);
+
+	/** Snapshot of the grid at the time of last check (word strings) */
+	let checkedSnapshot = $state<(string | null)[]>(Array(9).fill(null));
 
 	/** Whether the puzzle is complete and all correct */
-	let solved = $derived(grid.every((cell, i) => {
+	let solved = $derived(checked && grid.every((cell, i) => {
 		if (!cell) return false;
 		const correct = puzzle.solution[i];
 		return cell.word === correct.word;
 	}));
 
-	/** Number of correctly placed words */
-	let correctCount = $derived(grid.reduce((acc, cell, i) => {
-		if (!cell) return acc;
-		return acc + (cell.word === puzzle.solution[i].word ? 1 : 0);
-	}, 0));
-
-	let correctEdgeCount = $derived(
-		puzzle.edges.reduce((acc, edge) => acc + (getEdgeStatus(edge.from, edge.to) === 'correct' ? 1 : 0), 0)
+	/** Number of correctly placed words (only meaningful when checked) */
+	let correctCount = $derived(
+		checked
+			? grid.reduce((acc, cell, i) => {
+				if (!cell) return acc;
+				return acc + (cell.word === puzzle.solution[i].word ? 1 : 0);
+			}, 0)
+			: 0
 	);
 
-	function recordMove() {
-		moves += 1;
+	let correctEdgeCount = $derived(
+		checked
+			? puzzle.edges.reduce((acc, edge) => acc + (getRawEdgeStatus(edge.from, edge.to) === 'correct' ? 1 : 0), 0)
+			: 0
+	);
+
+	/** Invalidate check results whenever the grid changes from the checked snapshot */
+	function markDirty() {
+		if (!checked) return;
+		const current = grid.map((c) => c?.word ?? null);
+		const changed = current.some((w, i) => w !== checkedSnapshot[i]);
+		if (changed) {
+			checked = false;
+		}
+	}
+
+	function check() {
+		checks += 1;
+		checked = true;
+		checkedSnapshot = grid.map((c) => c?.word ?? null);
 	}
 
 	function getNodeStatus(index: number): NodeStatus {
 		const cell = grid[index];
 		if (!cell) return 'empty';
+		if (!checked) return 'unchecked';
 		return cell.word === puzzle.solution[index].word ? 'correct' : 'wrong';
 	}
 
-	function getEdgeStatus(fromIdx: number, toIdx: number): EdgeStatus {
+	function getRawEdgeStatus(fromIdx: number, toIdx: number): EdgeStatus {
 		const fromCell = grid[fromIdx];
 		const toCell = grid[toIdx];
 		if (!fromCell || !toCell) return 'empty';
@@ -51,6 +76,14 @@ export function createGameState(puzzle: Puzzle) {
 			return 'correct';
 		}
 		return 'wrong';
+	}
+
+	function getEdgeStatus(fromIdx: number, toIdx: number): EdgeStatus {
+		const fromCell = grid[fromIdx];
+		const toCell = grid[toIdx];
+		if (!fromCell || !toCell) return 'empty';
+		if (!checked) return 'empty';
+		return getRawEdgeStatus(fromIdx, toIdx);
 	}
 
 	function getEdgeClue(fromIdx: number, toIdx: number): string | undefined {
@@ -74,7 +107,7 @@ export function createGameState(puzzle: Puzzle) {
 		inventory = inventory.filter((w) => w.word !== word.word);
 		// Place in grid
 		grid[gridIndex] = word;
-		recordMove();
+		markDirty();
 	}
 
 	function removeFromGrid(gridIndex: number) {
@@ -82,7 +115,7 @@ export function createGameState(puzzle: Puzzle) {
 		if (cell) {
 			inventory = [...inventory, cell];
 			grid[gridIndex] = null;
-			recordMove();
+			markDirty();
 		}
 	}
 
@@ -99,7 +132,7 @@ export function createGameState(puzzle: Puzzle) {
 		const target = grid[toIdx];
 		grid[toIdx] = source;
 		grid[fromIdx] = target ?? null;
-		recordMove();
+		markDirty();
 	}
 
 	function swapGridCells(fromIdx: number, toIdx: number) {
@@ -111,7 +144,9 @@ export function createGameState(puzzle: Puzzle) {
 	function reset() {
 		inventory = shuffleArray([...puzzle.solution]);
 		grid = Array(9).fill(null);
-		moves = 0;
+		checks = 0;
+		checked = false;
+		checkedSnapshot = Array(9).fill(null);
 	}
 
 	return {
@@ -120,10 +155,12 @@ export function createGameState(puzzle: Puzzle) {
 		get solved() { return solved; },
 		get correctCount() { return correctCount; },
 		get correctEdgeCount() { return correctEdgeCount; },
-		get moves() { return moves; },
+		get checks() { return checks; },
+		get checked() { return checked; },
 		getNodeStatus,
 		getEdgeStatus,
 		getEdgeClue,
+		check,
 		placeWord,
 		removeFromGrid,
 		moveGridWord,
