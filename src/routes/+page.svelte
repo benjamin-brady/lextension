@@ -5,7 +5,7 @@
 	import GameBoard from '../lib/components/GameBoard.svelte';
 
 	const { puzzle, puzzleNumber } = getTodaysPuzzleInfo();
-	const game = createGameState(puzzle);
+	const game = createGameState(puzzle, puzzleNumber);
 </script>
 
 <div class="grid gap-2">

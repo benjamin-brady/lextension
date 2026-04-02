@@ -1,25 +1,76 @@
 import type { EdgeStatus, NodeStatus, Puzzle, WordItem } from './types';
 
+interface SavedState {
+	grid: (string | null)[];
+	inventory: string[];
+	checks: number;
+	cellChecked: boolean[];
+	checkedSnapshot: (string | null)[];
+}
+
+function storageKey(puzzleNumber: number): string {
+	return `simicle-game-${puzzleNumber}`;
+}
+
+function loadState(puzzleNumber: number): SavedState | null {
+	if (typeof localStorage === 'undefined') return null;
+	try {
+		const raw = localStorage.getItem(storageKey(puzzleNumber));
+		if (!raw) return null;
+		return JSON.parse(raw) as SavedState;
+	} catch {
+		return null;
+	}
+}
+
+function saveState(puzzleNumber: number, state: SavedState): void {
+	if (typeof localStorage === 'undefined') return;
+	try {
+		localStorage.setItem(storageKey(puzzleNumber), JSON.stringify(state));
+	} catch {
+		// storage full or unavailable
+	}
+}
+
 /**
  * Reactive game state using Svelte 5 runes.
  */
-export function createGameState(puzzle: Puzzle) {
+export function createGameState(puzzle: Puzzle, puzzleNumber: number) {
+	const saved = loadState(puzzleNumber);
+	const wordLookup = Object.fromEntries(puzzle.solution.map((w) => [w.word, w]));
+
 	/** Current grid: null means empty slot */
-	let grid = $state<(WordItem | null)[]>(Array(9).fill(null));
+	let grid = $state<(WordItem | null)[]>(
+		saved ? saved.grid.map((w) => (w ? wordLookup[w] ?? null : null)) : Array(9).fill(null)
+	);
 	const validEdgePairs = puzzle.edges.reduce<Record<string, true>>((lookup, edge) => {
 		lookup[edgeKey(puzzle.solution[edge.from].word, puzzle.solution[edge.to].word)] = true;
 		return lookup;
 	}, {});
 
 	/** Inventory: words not yet placed */
-	let inventory = $state<WordItem[]>(shuffleArray([...puzzle.solution]));
-	let checks = $state(0);
+	let inventory = $state<WordItem[]>(
+		saved
+			? saved.inventory.map((w) => wordLookup[w]).filter((w): w is WordItem => w != null)
+			: shuffleArray([...puzzle.solution])
+	);
+	let checks = $state(saved?.checks ?? 0);
 
 	/** Per-cell: whether the cell has been checked and not changed since */
-	let cellChecked = $state<boolean[]>(Array(9).fill(false));
+	let cellChecked = $state<boolean[]>(saved?.cellChecked ?? Array(9).fill(false));
 
 	/** Snapshot of words at each cell at last check time */
-	let checkedSnapshot = $state<(string | null)[]>(Array(9).fill(null));
+	let checkedSnapshot = $state<(string | null)[]>(saved?.checkedSnapshot ?? Array(9).fill(null));
+
+	$effect(() => {
+		saveState(puzzleNumber, {
+			grid: grid.map((c) => c?.word ?? null),
+			inventory: inventory.map((w) => w.word),
+			checks,
+			cellChecked: [...cellChecked],
+			checkedSnapshot: [...checkedSnapshot],
+		});
+	});
 
 	/** Whether the puzzle is complete and all correct */
 	let solved = $derived(cellChecked.every(Boolean) && grid.every((cell, i) => {
@@ -147,6 +198,9 @@ export function createGameState(puzzle: Puzzle) {
 		checks = 0;
 		cellChecked = Array(9).fill(false);
 		checkedSnapshot = Array(9).fill(null);
+		if (typeof localStorage !== 'undefined') {
+			localStorage.removeItem(storageKey(puzzleNumber));
+		}
 	}
 
 	return {
