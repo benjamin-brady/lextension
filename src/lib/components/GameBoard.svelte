@@ -3,7 +3,7 @@
 	import type { Puzzle, WordItem } from '../types';
 	import { ADJACENCIES } from '../types';
 
-	let { game, puzzleNumber, puzzle }: { game: GameState; puzzleNumber: number; puzzle: Puzzle } = $props();
+	let { game, shareLabel, puzzle }: { game: GameState; shareLabel: string; puzzle: Puzzle } = $props();
 
 	type DragItem = {
 		word: WordItem;
@@ -167,7 +167,7 @@
 			: `${game.correctCount}/9 words, ${game.correctEdgeCount}/${ADJACENCIES.length} links, ${game.checks} checks`;
 
 		const lines = [
-			`LexLink #${puzzleNumber}`,
+			`LexLink ${shareLabel}`,
 			statusLine,
 			shareRows()
 		];
@@ -196,7 +196,7 @@
 		try {
 			if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
 				await navigator.share({
-					title: `LexLink #${puzzleNumber}`,
+					title: `LexLink ${shareLabel}`,
 					text,
 					url
 				});
@@ -323,16 +323,16 @@
 
 <div class="flex flex-col items-center gap-3 select-none touch-none">
 	<div class="grid w-full max-w-sm grid-cols-3 gap-3">
-		<div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Checks</p>
+		<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Checks</p>
 			<p class="text-xl font-bold">{game.checks}</p>
 		</div>
-		<div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Words</p>
+		<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Words</p>
 			<p class="text-xl font-bold">{game.correctCount}/9</p>
 		</div>
-		<div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-			<p class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Links</p>
+		<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Links</p>
 			<p class="text-xl font-bold">{game.correctEdgeCount}/{ADJACENCIES.length}</p>
 		</div>
 	</div>
@@ -385,7 +385,7 @@
 			>
 				{#if cell}
 					<div
-						class="flex h-[72px] w-[72px] cursor-grab flex-col items-center justify-center gap-0.5 rounded-xl border-2 bg-[var(--surface-light)] transition-colors active:cursor-grabbing"
+						class="flex h-18 w-18 cursor-grab flex-col items-center justify-center gap-0.5 rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
 						style="border-color: {nodeOutline(i)};"
 						role="button"
 						aria-label={`Move ${cell.word}`}
@@ -398,10 +398,10 @@
 						<span class="text-sm font-semibold">{cell.word}</span>
 					</div>
 				{:else if dragOverIndex === i}
-					<div class="flex h-[72px] w-[72px] items-center justify-center rounded-xl border-2 border-dashed border-[var(--accent)] bg-[var(--surface)] opacity-70"></div>
+					<div class="flex h-18 w-18 items-center justify-center rounded-xl border-2 border-dashed border-(--accent) bg-(--surface) opacity-70"></div>
 				{:else}
 					<div
-						class="h-[72px] w-[72px] rounded-xl border-2 bg-[var(--surface)] transition-colors"
+						class="h-18 w-18 rounded-xl border-2 bg-(--surface) transition-colors"
 						style="border-color: {nodeOutline(i)};"
 					></div>
 				{/if}
@@ -412,20 +412,20 @@
 	<!-- Status -->
 	{#if game.solved}
 		<div class="text-center">
-			<p class="text-lg font-bold text-[var(--green)]">Solved! 🎉</p>
+			<p class="text-lg font-bold text-(--green)">Solved! 🎉</p>
 		</div>
 
-		<section class="w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-			<h2 class="text-sm font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+		<section class="w-full rounded-2xl border border-(--border) bg-(--surface) p-4">
+			<h2 class="text-sm font-bold uppercase tracking-[0.18em] text-(--text-muted)">
 				Why the links work
 			</h2>
 			<div class="mt-3 grid gap-3">
 				{#each solvedLinks as link (`${link.from.word}-${link.to.word}`)}
-					<div class="rounded-xl border border-[var(--border)] bg-[var(--surface-light)] px-3 py-3">
+					<div class="rounded-xl border border-(--border) bg-(--surface-light) px-3 py-3">
 						<p class="text-sm font-semibold">
 							{link.from.word} → {link.to.word}
 						</p>
-						<p class="mt-1 text-sm text-[var(--text-muted)]">{link.clue}</p>
+						<p class="mt-1 text-sm text-(--text-muted)">{link.clue}</p>
 					</div>
 				{/each}
 			</div>
@@ -434,7 +434,7 @@
 
 	<!-- Inventory -->
 	<div
-		class="flex flex-wrap justify-center gap-2 min-h-[48px] w-full p-2 rounded-xl bg-[var(--surface)] border border-[var(--border)]"
+		class="flex min-h-12 w-full flex-wrap justify-center gap-2 rounded-xl border border-(--border) bg-(--surface) p-2"
 		data-inventory
 		role="list"
 		ondragover={(e) => {
@@ -446,13 +446,13 @@
 		ondrop={onDropInventory}
 	>
 		{#if game.inventory.length === 0}
-			<p class="text-sm text-[var(--text-muted)] self-center">
+			<p class="self-center text-sm text-(--text-muted)">
 				{game.solved ? 'All words placed!' : 'Drag words back here to rearrange'}
 			</p>
 		{/if}
 		{#each game.inventory as word (word.word)}
 			<div
-				class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--surface-light)] border border-[var(--border)] cursor-grab active:cursor-grabbing hover:border-[var(--accent)] transition-colors"
+				class="flex cursor-grab items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors hover:border-(--accent) active:cursor-grabbing"
 				draggable="true"
 				role="listitem"
 				ondragstart={(e) => onDragStartInventory(e, word)}
@@ -467,20 +467,20 @@
 	<div class="flex items-center gap-3">
 		{#if !game.solved}
 			<button
-				class="px-5 py-2 text-sm font-semibold rounded-lg bg-[var(--accent)] text-white hover:opacity-90 transition-opacity cursor-pointer"
+				class="cursor-pointer rounded-lg bg-(--accent) px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
 				onclick={() => game.check()}
 			>
 				Check
 			</button>
 		{/if}
 		<button
-			class="px-4 py-2 text-sm rounded-lg bg-[var(--surface-light)] border border-[var(--border)] hover:border-[var(--accent)] transition-colors cursor-pointer"
+			class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
 			onclick={shareResult}
 		>
 			Share
 		</button>
 		<button
-			class="px-4 py-2 text-sm rounded-lg bg-[var(--surface-light)] border border-[var(--border)] hover:border-[var(--accent)] transition-colors cursor-pointer"
+			class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
 			onclick={() => game.reset()}
 		>
 			Reset
@@ -488,14 +488,14 @@
 	</div>
 
 	{#if shareFeedback}
-		<p class="text-sm text-[var(--text-muted)]">{shareFeedback}</p>
+		<p class="text-sm text-(--text-muted)">{shareFeedback}</p>
 	{/if}
 </div>
 
 <!-- Touch drag ghost -->
 {#if touchDragItem && touchGhost}
 	<div
-		class="fixed pointer-events-none z-50 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--accent)] text-white shadow-lg"
+		class="fixed z-50 flex items-center gap-1.5 rounded-lg bg-(--accent) px-3 py-2 text-white shadow-lg pointer-events-none"
 		style="left: {touchGhost.x - 40}px; top: {touchGhost.y - 30}px;"
 	>
 		<span class="text-sm font-semibold">{touchDragItem.word.word}</span>

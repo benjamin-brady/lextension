@@ -8,14 +8,14 @@ interface SavedState {
 	checkedSnapshot: (string | null)[];
 }
 
-function storageKey(puzzleNumber: number): string {
-	return `simicle-game-${puzzleNumber}`;
+function storageKey(storageId: string): string {
+	return `simicle-game-${storageId}`;
 }
 
-function loadState(puzzleNumber: number): SavedState | null {
+function loadState(storageId: string): SavedState | null {
 	if (typeof localStorage === 'undefined') return null;
 	try {
-		const raw = localStorage.getItem(storageKey(puzzleNumber));
+		const raw = localStorage.getItem(storageKey(storageId));
 		if (!raw) return null;
 		return JSON.parse(raw) as SavedState;
 	} catch {
@@ -23,10 +23,10 @@ function loadState(puzzleNumber: number): SavedState | null {
 	}
 }
 
-function saveState(puzzleNumber: number, state: SavedState): void {
+function saveState(storageId: string, state: SavedState): void {
 	if (typeof localStorage === 'undefined') return;
 	try {
-		localStorage.setItem(storageKey(puzzleNumber), JSON.stringify(state));
+		localStorage.setItem(storageKey(storageId), JSON.stringify(state));
 	} catch {
 		// storage full or unavailable
 	}
@@ -35,8 +35,8 @@ function saveState(puzzleNumber: number, state: SavedState): void {
 /**
  * Reactive game state using Svelte 5 runes.
  */
-export function createGameState(puzzle: Puzzle, puzzleNumber: number) {
-	const saved = loadState(puzzleNumber);
+export function createGameState(puzzle: Puzzle, storageId: string) {
+	const saved = loadState(storageId);
 	const wordLookup = Object.fromEntries(puzzle.solution.map((w) => [w.word, w]));
 
 	/** Current grid: null means empty slot */
@@ -63,7 +63,7 @@ export function createGameState(puzzle: Puzzle, puzzleNumber: number) {
 	let checkedSnapshot = $state<(string | null)[]>(saved?.checkedSnapshot ?? Array(9).fill(null));
 
 	$effect(() => {
-		saveState(puzzleNumber, {
+		saveState(storageId, {
 			grid: grid.map((c) => c?.word ?? null),
 			inventory: inventory.map((w) => w.word),
 			checks,
@@ -199,7 +199,7 @@ export function createGameState(puzzle: Puzzle, puzzleNumber: number) {
 		cellChecked = Array(9).fill(false);
 		checkedSnapshot = Array(9).fill(null);
 		if (typeof localStorage !== 'undefined') {
-			localStorage.removeItem(storageKey(puzzleNumber));
+			localStorage.removeItem(storageKey(storageId));
 		}
 	}
 

@@ -1,15 +1,5 @@
 import type { Puzzle } from './types';
 
-/**
- * King 🤴 — Crown 👑 — Tooth 🦷
- *   |          |          |
- * Fairy 🧚 — Tale 📖 — Tail 🐒
- *   |          |          |
- * Coat 🧥 — Pocket 👖 — Watch ⌚
- *
- * Tower 🗼, Guard 💂, Palace 🏰 used in alternate puzzle
- */
-
 export const PUZZLES: Puzzle[] = [
 	{
 		solution: [
@@ -24,24 +14,18 @@ export const PUZZLES: Puzzle[] = [
 			{ word: 'Watch' },
 		],
 		edges: [
-			// Row 0
-			{ from: 0, to: 1, clue: 'Kings wear crowns' },
-			{ from: 1, to: 2, clue: 'A crown goes on a tooth' },
-			// Row 1
-			{ from: 3, to: 4, clue: 'Fairies show up in fairy tales' },
-			{ from: 4, to: 5, clue: 'Tale becomes tail if it wags' },
-			// Row 2
-			{ from: 6, to: 7, clue: 'Coats are where pockets happen' },
-			{ from: 7, to: 8, clue: 'A pocket watch' },
-			// Col 0
-			{ from: 0, to: 3, clue: 'The tooth fairy' },
-			{ from: 3, to: 6, clue: 'A fairy-tale coat (fur coat)' },
-			// Col 1
-			{ from: 1, to: 4, clue: 'Crown tale (a tall tale)' },
-			{ from: 4, to: 7, clue: 'A tall tale has pockets of truth' },
-			// Col 2
-			{ from: 2, to: 5, clue: 'Tooth and tail end of something' },
-			{ from: 5, to: 8, clue: 'A cat watches its tail' },
+			{ from: 0, to: 1, clue: 'Kings wear crowns.' },
+			{ from: 1, to: 2, clue: 'A crown can cap a damaged tooth.' },
+			{ from: 3, to: 4, clue: 'Fairies belong in fairy tales.' },
+			{ from: 4, to: 5, clue: 'A tale becomes a tail with one wrong turn.' },
+			{ from: 6, to: 7, clue: 'Coats come with pockets.' },
+			{ from: 7, to: 8, clue: 'A pocket watch lives in a waistcoat.' },
+			{ from: 0, to: 3, clue: 'The tooth fairy is on familiar terms with both.' },
+			{ from: 3, to: 6, clue: 'A fairy-tale coat is the sort of thing a wolf might borrow.' },
+			{ from: 1, to: 4, clue: 'Crowns feature in plenty of tales.' },
+			{ from: 4, to: 7, clue: 'Some tales have deep pockets of nonsense.' },
+			{ from: 2, to: 5, clue: 'Both can describe an end.' },
+			{ from: 5, to: 8, clue: 'A watchful animal keeps an eye on its tail.' },
 		],
 	},
 	{
@@ -57,24 +41,18 @@ export const PUZZLES: Puzzle[] = [
 			{ word: 'Card' },
 		],
 		edges: [
-			// Row 0
-			{ from: 0, to: 1, clue: 'Cars have trunks' },
-			{ from: 1, to: 2, clue: 'Elephants are famous for their trunks' },
-			// Row 1
-			{ from: 3, to: 4, clue: 'A race suit' },
-			{ from: 4, to: 5, clue: 'A suit from memory (card games)' },
-			// Row 2
-			{ from: 6, to: 7, clue: 'Tracking a case' },
-			{ from: 7, to: 8, clue: 'A card case' },
-			// Col 0
-			{ from: 0, to: 3, clue: 'Car race' },
-			{ from: 3, to: 6, clue: 'Race track' },
-			// Col 1
-			{ from: 1, to: 4, clue: 'A trunk suit(case)' },
-			{ from: 4, to: 7, clue: 'A suit case' },
-			// Col 2
-			{ from: 2, to: 5, clue: 'An elephant never forgets' },
-			{ from: 5, to: 8, clue: 'A memory card' },
+			{ from: 0, to: 1, clue: 'Cars have trunks.' },
+			{ from: 1, to: 2, clue: 'Elephants are famous for theirs.' },
+			{ from: 3, to: 4, clue: 'A race suit belongs on a track.' },
+			{ from: 4, to: 5, clue: 'Card suits live in memory if you play enough.' },
+			{ from: 6, to: 7, clue: 'A case can be tracked.' },
+			{ from: 7, to: 8, clue: 'A card case stores the deck.' },
+			{ from: 0, to: 3, clue: 'A car race is the obvious pairing.' },
+			{ from: 3, to: 6, clue: 'A race track completes the circuit.' },
+			{ from: 1, to: 4, clue: 'A trunk can count as a kind of suit or case.' },
+			{ from: 4, to: 7, clue: 'A suitcase rolls through the airport.' },
+			{ from: 2, to: 5, clue: 'Elephants have the reputation memory wants.' },
+			{ from: 5, to: 8, clue: 'A memory card stores the lot.' },
 		],
 	},
 	{
@@ -90,18 +68,18 @@ export const PUZZLES: Puzzle[] = [
 			{ word: 'Band' },
 		],
 		edges: [
-			{ from: 0, to: 1, clue: 'A tower guard' },
-			{ from: 1, to: 2, clue: 'A guard dog' },
-			{ from: 3, to: 4, clue: 'A clock strikes at night' },
-			{ from: 4, to: 5, clue: 'The night watch' },
-			{ from: 6, to: 7, clue: 'To hand-raise an owl' },
-			{ from: 7, to: 8, clue: 'An owl band (leg band)' },
-			{ from: 0, to: 3, clue: 'A clock tower' },
-			{ from: 3, to: 6, clue: 'A clock hand' },
-			{ from: 1, to: 4, clue: 'A night guard' },
-			{ from: 4, to: 7, clue: 'A night owl' },
-			{ from: 2, to: 5, clue: 'A watch dog' },
-			{ from: 5, to: 8, clue: 'A watch band' },
+			{ from: 0, to: 1, clue: 'A tower guard keeps watch.' },
+			{ from: 1, to: 2, clue: 'A guard dog does the same with teeth.' },
+			{ from: 3, to: 4, clue: 'The clock gets loud in the middle of the night.' },
+			{ from: 4, to: 5, clue: 'The night watch works while everyone else sleeps.' },
+			{ from: 6, to: 7, clue: 'An owl can be hand-raised.' },
+			{ from: 7, to: 8, clue: 'An owl band is fitted by researchers.' },
+			{ from: 0, to: 3, clue: 'A clock tower is built to be seen.' },
+			{ from: 3, to: 6, clue: 'A clock hand marks the hour.' },
+			{ from: 1, to: 4, clue: 'A night guard patrols the quiet halls.' },
+			{ from: 4, to: 7, clue: 'A night owl refuses the obvious bedtime.' },
+			{ from: 2, to: 5, clue: 'A watchdog notices trouble early.' },
+			{ from: 5, to: 8, clue: 'A watch band holds the face in place.' },
 		],
 	},
 	{
@@ -117,18 +95,18 @@ export const PUZZLES: Puzzle[] = [
 			{ word: 'Seat' },
 		],
 		edges: [
-			{ from: 0, to: 1, clue: 'A fire alarm' },
-			{ from: 1, to: 2, clue: 'You hit the alarm button' },
-			{ from: 3, to: 4, clue: 'A drill press' },
-			{ from: 4, to: 5, clue: 'A press box at a stadium' },
-			{ from: 6, to: 7, clue: 'A bench vice mounts to the workbench' },
-			{ from: 7, to: 8, clue: 'A bench seat' },
-			{ from: 0, to: 3, clue: 'A fire drill' },
-			{ from: 3, to: 6, clue: 'A drill vice keeps the piece steady' },
-			{ from: 1, to: 4, clue: 'You press the alarm to trigger it' },
-			{ from: 4, to: 7, clue: 'A bench press' },
-			{ from: 2, to: 5, clue: 'A button box stores buttons or controls' },
-			{ from: 5, to: 8, clue: 'A box seat at the theater' },
+			{ from: 0, to: 1, clue: 'A fire alarm wants your attention immediately.' },
+			{ from: 1, to: 2, clue: 'You hit the alarm button in a hurry.' },
+			{ from: 3, to: 4, clue: 'A drill press belongs in a workshop.' },
+			{ from: 4, to: 5, clue: 'A press box hovers over the field.' },
+			{ from: 6, to: 7, clue: 'A bench vice bolts to the workbench.' },
+			{ from: 7, to: 8, clue: 'A bench seat runs the width of the row.' },
+			{ from: 0, to: 3, clue: 'A fire drill is all practice and no flames.' },
+			{ from: 3, to: 6, clue: 'A vice steadies the piece beneath the drill.' },
+			{ from: 1, to: 4, clue: 'You press the alarm to trigger it.' },
+			{ from: 4, to: 7, clue: 'A bench press does not feel optional halfway through.' },
+			{ from: 2, to: 5, clue: 'A button box can store buttons or controls.' },
+			{ from: 5, to: 8, clue: 'A box seat sits off to the side.' },
 		],
 	},
 	{
@@ -144,23 +122,351 @@ export const PUZZLES: Puzzle[] = [
 			{ word: 'Storm' },
 		],
 		edges: [
-			{ from: 0, to: 1, clue: 'A boil is a skin condition' },
-			{ from: 1, to: 2, clue: 'You boil water to heat it' },
-			{ from: 3, to: 4, clue: 'A drum roll builds suspense' },
-			{ from: 4, to: 5, clue: 'Waves roll in with the tide' },
-			{ from: 6, to: 7, clue: 'A thunderstick makes noise at games' },
-			{ from: 7, to: 8, clue: 'Thunder is the voice of a storm' },
-			{ from: 0, to: 3, clue: 'A drum has a skin membrane stretched over it' },
-			{ from: 3, to: 6, clue: 'You play a drum with sticks' },
-			{ from: 1, to: 4, clue: 'A rolling boil is the most vigorous stage' },
-			{ from: 4, to: 7, clue: 'A roll of thunder echoes across the sky' },
-			{ from: 2, to: 5, clue: 'Tides pull and push the water' },
-			{ from: 5, to: 8, clue: 'A storm surge raises the tide dangerously' },
+			{ from: 0, to: 1, clue: 'A boil can be a skin problem.' },
+			{ from: 1, to: 2, clue: 'Water reaches a boil before it rages.' },
+			{ from: 3, to: 4, clue: 'A drum roll builds the suspense.' },
+			{ from: 4, to: 5, clue: 'The tide rolls in and pretends it owns the beach.' },
+			{ from: 6, to: 7, clue: 'A thunderstick makes crowd-sized noise.' },
+			{ from: 7, to: 8, clue: 'Thunder is the voice of a storm.' },
+			{ from: 0, to: 3, clue: 'A drum skin stretches tight across the shell.' },
+			{ from: 3, to: 6, clue: 'Drums are played with sticks.' },
+			{ from: 1, to: 4, clue: 'A rolling boil is the vigorous version.' },
+			{ from: 4, to: 7, clue: 'A roll of thunder crosses the valley.' },
+			{ from: 2, to: 5, clue: 'The tide moves the water.' },
+			{ from: 5, to: 8, clue: 'A storm surge turns the tide hostile.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Tea' },
+			{ word: 'Green' },
+			{ word: 'Power' },
+			{ word: 'Tree' },
+			{ word: 'House' },
+			{ word: 'Plant' },
+			{ word: 'Line' },
+			{ word: 'Party' },
+			{ word: 'Food' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'Green tea is the gentler cup.' },
+			{ from: 1, to: 2, clue: 'Green power comes from cleaner sources.' },
+			{ from: 3, to: 4, clue: 'A tree house belongs above ground level.' },
+			{ from: 4, to: 5, clue: 'A houseplant lives indoors.' },
+			{ from: 6, to: 7, clue: 'A party line once shared a neighborhood phone.' },
+			{ from: 7, to: 8, clue: 'Party food disappears first.' },
+			{ from: 0, to: 3, clue: 'The tea tree lends its name to the oil.' },
+			{ from: 3, to: 6, clue: 'A tree line marks where growth gives up.' },
+			{ from: 1, to: 4, clue: 'Greenhouse is the compound hiding in plain sight.' },
+			{ from: 4, to: 7, clue: 'A house party gets louder than intended.' },
+			{ from: 2, to: 5, clue: 'A power plant makes the grid hum.' },
+			{ from: 5, to: 8, clue: 'Plant food keeps the leaves honest.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Tea' },
+			{ word: 'Party' },
+			{ word: 'Floor' },
+			{ word: 'Tree' },
+			{ word: 'Line' },
+			{ word: 'Dance' },
+			{ word: 'Top' },
+			{ word: 'Up' },
+			{ word: 'Step' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'A tea party can be genteel or chaotic.' },
+			{ from: 1, to: 2, clue: 'The party floor is where the crowd collects.' },
+			{ from: 3, to: 4, clue: 'A tree line marks the last timber standing.' },
+			{ from: 4, to: 5, clue: 'A line dance keeps everyone facing the same way.' },
+			{ from: 6, to: 7, clue: 'Top up the balance and carry on.' },
+			{ from: 7, to: 8, clue: 'Step up when it matters.' },
+			{ from: 0, to: 3, clue: 'Tea tree oil is the scented answer.' },
+			{ from: 3, to: 6, clue: 'A treetop is where the wind gets first say.' },
+			{ from: 1, to: 4, clue: 'A party line can be a script or a wire.' },
+			{ from: 4, to: 7, clue: 'Line up and wait your turn.' },
+			{ from: 2, to: 5, clue: 'A dance floor fills before the song finishes.' },
+			{ from: 5, to: 8, clue: 'A dance step is learned one beat at a time.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Tower' },
+			{ word: 'Power' },
+			{ word: 'Horse' },
+			{ word: 'Water' },
+			{ word: 'Plant' },
+			{ word: 'Food' },
+			{ word: 'Gate' },
+			{ word: 'House' },
+			{ word: 'Dog' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'A power tower rises over transmission lines.' },
+			{ from: 1, to: 2, clue: 'Horsepower measures what the engine can do.' },
+			{ from: 3, to: 4, clue: 'A water plant filters what the city drinks.' },
+			{ from: 4, to: 5, clue: 'Plant food keeps roots ambitious.' },
+			{ from: 6, to: 7, clue: 'A gatehouse keeps the entrance honest.' },
+			{ from: 7, to: 8, clue: 'A doghouse is where mistakes get remembered.' },
+			{ from: 0, to: 3, clue: 'A water tower is a skyline landmark.' },
+			{ from: 3, to: 6, clue: 'Watergate became a word bigger than the building.' },
+			{ from: 1, to: 4, clue: 'A power plant supplies the region.' },
+			{ from: 4, to: 7, clue: 'A houseplant survives by the window.' },
+			{ from: 2, to: 5, clue: 'Horse food is measured by the scoop.' },
+			{ from: 5, to: 8, clue: 'Dog food is never marketed to cats.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Man' },
+			{ word: 'Foot' },
+			{ word: 'Locker' },
+			{ word: 'Snow' },
+			{ word: 'Ball' },
+			{ word: 'Room' },
+			{ word: 'Board' },
+			{ word: 'Game' },
+			{ word: 'Escape' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'A footman serves the household.' },
+			{ from: 1, to: 2, clue: 'A footlocker keeps kit in one place.' },
+			{ from: 3, to: 4, clue: 'A snowball grows if you keep rolling it.' },
+			{ from: 4, to: 5, clue: 'A ballroom invites a formal spin.' },
+			{ from: 6, to: 7, clue: 'A board game belongs on the table.' },
+			{ from: 7, to: 8, clue: 'An escape game works best under pressure.' },
+			{ from: 0, to: 3, clue: 'A snowman is assembled in the cold.' },
+			{ from: 3, to: 6, clue: 'A snowboard takes the slope sideways.' },
+			{ from: 1, to: 4, clue: 'Football is the obvious collision.' },
+			{ from: 4, to: 7, clue: 'A ball game can turn with one swing.' },
+			{ from: 2, to: 5, clue: 'A locker room is all echoes and benches.' },
+			{ from: 5, to: 8, clue: 'An escape room rewards calm minds.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Sea' },
+			{ word: 'Life' },
+			{ word: 'Style' },
+			{ word: 'Coast' },
+			{ word: 'Line' },
+			{ word: 'Dance' },
+			{ word: 'Clear' },
+			{ word: 'Up' },
+			{ word: 'Step' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'Sea life keeps the reef busy.' },
+			{ from: 1, to: 2, clue: 'Lifestyle choices add up.' },
+			{ from: 3, to: 4, clue: 'A coastline is where maps get interesting.' },
+			{ from: 4, to: 5, clue: 'A line dance keeps the formation neat.' },
+			{ from: 6, to: 7, clue: 'Clear up the mess before you leave.' },
+			{ from: 7, to: 8, clue: 'Step up and take the turn.' },
+			{ from: 0, to: 3, clue: 'The seacoast is where land negotiates with water.' },
+			{ from: 3, to: 6, clue: 'When the coast is clear, move.' },
+			{ from: 1, to: 4, clue: 'A lifeline is not optional when it matters.' },
+			{ from: 4, to: 7, clue: 'Line up and keep it orderly.' },
+			{ from: 2, to: 5, clue: 'Dance style changes with the decade.' },
+			{ from: 5, to: 8, clue: 'A dance step is learned one beat at a time.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Watch' },
+			{ word: 'Night' },
+			{ word: 'Sleeper' },
+			{ word: 'Dog' },
+			{ word: 'Guard' },
+			{ word: 'Rail' },
+			{ word: 'Sea' },
+			{ word: 'Coast' },
+			{ word: 'Line' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'The night watch belongs to the dark hours.' },
+			{ from: 1, to: 2, clue: 'A night sleeper takes the overnight route.' },
+			{ from: 3, to: 4, clue: 'A guard dog discourages bad ideas.' },
+			{ from: 4, to: 5, clue: 'A guard rail keeps the edge negotiable.' },
+			{ from: 6, to: 7, clue: 'The seacoast is the border with weather.' },
+			{ from: 7, to: 8, clue: 'A coastline is traced, never rushed.' },
+			{ from: 0, to: 3, clue: 'A watchdog notices what the room missed.' },
+			{ from: 3, to: 6, clue: 'A sea dog has spent time on rough water.' },
+			{ from: 1, to: 4, clue: 'A night guard owns the empty building.' },
+			{ from: 4, to: 7, clue: 'The coast guard arrives with authority.' },
+			{ from: 2, to: 5, clue: 'A rail sleeper lies beneath the track.' },
+			{ from: 5, to: 8, clue: 'A rail line runs farther than it seems.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Tea' },
+			{ word: 'Tree' },
+			{ word: 'Line' },
+			{ word: 'House' },
+			{ word: 'Party' },
+			{ word: 'Food' },
+			{ word: 'Green' },
+			{ word: 'Room' },
+			{ word: 'Service' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'The tea tree is known more for oil than cups.' },
+			{ from: 1, to: 2, clue: 'A tree line marks the altitude limit.' },
+			{ from: 3, to: 4, clue: 'A house party expands to fit the walls.' },
+			{ from: 4, to: 5, clue: 'Party food vanishes before the mains.' },
+			{ from: 6, to: 7, clue: 'A green room waits just offstage.' },
+			{ from: 7, to: 8, clue: 'Room service arrives on a tray.' },
+			{ from: 0, to: 3, clue: 'A tea house promises a slower hour.' },
+			{ from: 3, to: 6, clue: 'Greenhouse hides inside the pair if you rotate it mentally.' },
+			{ from: 1, to: 4, clue: 'A party line can be political or telephone-based.' },
+			{ from: 4, to: 7, clue: 'A party room is booked for later.' },
+			{ from: 2, to: 5, clue: 'A food line forms fast when lunch opens.' },
+			{ from: 5, to: 8, clue: 'Food service is logistics wearing an apron.' },
 		],
 	},
 ];
 
-/** Get today's puzzle (cycles through available puzzles by day) */
+export const PRACTICE_PUZZLES: Puzzle[] = PUZZLES;
+
+export const HARD_PRACTICE_PUZZLES: Puzzle[] = [
+	{
+		solution: [
+			{ word: 'Tea' },
+			{ word: 'Party' },
+			{ word: 'Floor' },
+			{ word: 'Tree' },
+			{ word: 'Line' },
+			{ word: 'Dance' },
+			{ word: 'Top' },
+			{ word: 'Up' },
+			{ word: 'Step' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'One is poured; the other is formed.' },
+			{ from: 1, to: 2, clue: 'The celebration claims the boards.' },
+			{ from: 3, to: 4, clue: 'Altitude trims the forest into a single edge.' },
+			{ from: 4, to: 5, clue: 'Alignment becomes choreography.' },
+			{ from: 6, to: 7, clue: 'To replenish is to move the upper bound again.' },
+			{ from: 7, to: 8, clue: 'Promotion can be only a stride away.' },
+			{ from: 0, to: 3, clue: 'The bottle in the medicine cabinet points to this tree.' },
+			{ from: 3, to: 6, clue: 'The highest leaves catch the first weather.' },
+			{ from: 1, to: 4, clue: 'This phrase can be propaganda or telephone etiquette.' },
+			{ from: 4, to: 7, clue: 'Queue first, argue later.' },
+			{ from: 2, to: 5, clue: 'The boards wait for the beat.' },
+			{ from: 5, to: 8, clue: 'Patterned movement is built from these.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Tower' },
+			{ word: 'Power' },
+			{ word: 'Horse' },
+			{ word: 'Water' },
+			{ word: 'Plant' },
+			{ word: 'Food' },
+			{ word: 'Gate' },
+			{ word: 'House' },
+			{ word: 'Dog' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'Steel lattice and transmission lore.' },
+			{ from: 1, to: 2, clue: 'Engines still borrow the animal.' },
+			{ from: 3, to: 4, clue: 'Municipal chemistry in plain sight.' },
+			{ from: 4, to: 5, clue: 'A scoop from the garden shelf.' },
+			{ from: 6, to: 7, clue: 'An entrance with a building attached.' },
+			{ from: 7, to: 8, clue: 'Domestic exile after a mistake.' },
+			{ from: 0, to: 3, clue: 'The skyline version of stored pressure.' },
+			{ from: 3, to: 6, clue: 'A proper noun that escaped into political shorthand.' },
+			{ from: 1, to: 4, clue: 'Generation happens here.' },
+			{ from: 4, to: 7, clue: 'A potted resident by the window.' },
+			{ from: 2, to: 5, clue: 'Stable rations, not metaphorical ones.' },
+			{ from: 5, to: 8, clue: 'The bag in the pantry with the wrong mascot for cats.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Sea' },
+			{ word: 'Life' },
+			{ word: 'Style' },
+			{ word: 'Coast' },
+			{ word: 'Line' },
+			{ word: 'Dance' },
+			{ word: 'Clear' },
+			{ word: 'Up' },
+			{ word: 'Step' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'The reef’s census.' },
+			{ from: 1, to: 2, clue: 'Habit dressed as identity.' },
+			{ from: 3, to: 4, clue: 'A mapmaker’s favorite boundary.' },
+			{ from: 4, to: 5, clue: 'Rows become movement.' },
+			{ from: 6, to: 7, clue: 'Resolution after disorder.' },
+			{ from: 7, to: 8, clue: 'Advancement with posture.' },
+			{ from: 0, to: 3, clue: 'Land and saltwater sharing a noun.' },
+			{ from: 3, to: 6, clue: 'Only proceed once this idiom is true.' },
+			{ from: 1, to: 4, clue: 'A literal rope, then a metaphor.' },
+			{ from: 4, to: 7, clue: 'Arrange yourselves.' },
+			{ from: 2, to: 5, clue: 'Form expressed as movement.' },
+			{ from: 5, to: 8, clue: 'One unit of choreography.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Watch' },
+			{ word: 'Night' },
+			{ word: 'Sleeper' },
+			{ word: 'Dog' },
+			{ word: 'Guard' },
+			{ word: 'Rail' },
+			{ word: 'Sea' },
+			{ word: 'Coast' },
+			{ word: 'Line' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'The shift no sun attends.' },
+			{ from: 1, to: 2, clue: 'A berth with departure and arrival attached.' },
+			{ from: 3, to: 4, clue: 'Teeth assigned to perimeter duty.' },
+			{ from: 4, to: 5, clue: 'Metal persuasion at the edge.' },
+			{ from: 6, to: 7, clue: 'Where the charts start getting jagged.' },
+			{ from: 7, to: 8, clue: 'Cartography reduced to a single trace.' },
+			{ from: 0, to: 3, clue: 'Suspicion with fur.' },
+			{ from: 3, to: 6, clue: 'An old sailor in two short words.' },
+			{ from: 1, to: 4, clue: 'The key ring and the flashlight belong to this job.' },
+			{ from: 4, to: 7, clue: 'The cutters with authority.' },
+			{ from: 2, to: 5, clue: 'The timber beneath the sleepers is not what this means.' },
+			{ from: 5, to: 8, clue: 'A route of steel and timetables.' },
+		],
+	},
+	{
+		solution: [
+			{ word: 'Tea' },
+			{ word: 'Tree' },
+			{ word: 'Line' },
+			{ word: 'House' },
+			{ word: 'Party' },
+			{ word: 'Food' },
+			{ word: 'Green' },
+			{ word: 'Room' },
+			{ word: 'Service' },
+		],
+		edges: [
+			{ from: 0, to: 1, clue: 'The bottle in the bathroom cabinet hints at this pairing.' },
+			{ from: 1, to: 2, clue: 'Forests surrender to altitude here.' },
+			{ from: 3, to: 4, clue: 'A venue disguised as a living room.' },
+			{ from: 4, to: 5, clue: 'Finger food has found its crowd.' },
+			{ from: 6, to: 7, clue: 'Backstage, but not yet onstage.' },
+			{ from: 7, to: 8, clue: 'The knock at the hotel door.' },
+			{ from: 0, to: 3, clue: 'A quiet place built around a hot drink.' },
+			{ from: 3, to: 6, clue: 'Read the compound backward if you need to.' },
+			{ from: 1, to: 4, clue: 'One shared wire, many listeners.' },
+			{ from: 4, to: 7, clue: 'The booked space behind the closed door.' },
+			{ from: 2, to: 5, clue: 'Lunch makes this queue inevitable.' },
+			{ from: 5, to: 8, clue: 'An industry of aprons, invoices, and speed.' },
+		],
+	},
+];
+
 export function getTodaysPuzzle(): Puzzle {
 	const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
 	return PUZZLES[daysSinceEpoch % PUZZLES.length];
@@ -171,6 +477,22 @@ export function getTodaysPuzzleInfo(): { puzzle: Puzzle; puzzleNumber: number; c
 	return {
 		puzzle: PUZZLES[daysSinceEpoch % PUZZLES.length],
 		puzzleNumber: daysSinceEpoch + 1,
-		cycleIndex: daysSinceEpoch % PUZZLES.length
+		cycleIndex: daysSinceEpoch % PUZZLES.length,
 	};
+}
+
+export function getPracticePuzzle(id: number): Puzzle | undefined {
+	return PRACTICE_PUZZLES[id - 1];
+}
+
+export function getHardPracticePuzzle(id: number): Puzzle | undefined {
+	return HARD_PRACTICE_PUZZLES[id - 1];
+}
+
+export function getPracticePuzzleCount(): number {
+	return PRACTICE_PUZZLES.length;
+}
+
+export function getHardPracticePuzzleCount(): number {
+	return HARD_PRACTICE_PUZZLES.length;
 }

@@ -34,7 +34,12 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 <div class="min-h-dvh flex flex-col items-center bg-[var(--bg)] text-[var(--text)]">
 	<header class="w-full text-center py-2 border-b border-[var(--border)]">
 		<h1 class="text-2xl font-bold tracking-tight">LexLink</h1>
-		<p class="text-sm text-[var(--text-muted)]">Place the words so connected pairs share a link</p>
+		<p class="text-sm text-(--text-muted)">Place the words so connected pairs share a link</p>
+		<nav class="mt-2 flex items-center justify-center gap-2 text-sm">
+			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/">Today</a>
+			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/daily">Daily</a>
+			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/practice">Practice</a>
+		</nav>
 	</header>
 	<main class="flex-1 w-full max-w-lg mx-auto px-4 py-3">
 		{@render children()}
