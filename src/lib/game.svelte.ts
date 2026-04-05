@@ -43,11 +43,6 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	let grid = $state<(WordItem | null)[]>(
 		saved ? saved.grid.map((w) => (w ? wordLookup[w] ?? null : null)) : Array(9).fill(null)
 	);
-	const validEdgePairs = puzzle.edges.reduce<Record<string, true>>((lookup, edge) => {
-		lookup[edgeKey(puzzle.solution[edge.from].word, puzzle.solution[edge.to].word)] = true;
-		return lookup;
-	}, {});
-
 	/** Inventory: words not yet placed */
 	let inventory = $state<WordItem[]>(
 		saved
@@ -88,7 +83,7 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	);
 
 	let correctEdgeCount = $derived(
-		puzzle.edges.reduce((acc, edge) => acc + (getRawEdgeStatus(edge.from, edge.to) === 'correct' ? 1 : 0), 0)
+		puzzle.edges.reduce((acc, edge) => acc + (getEdgeStatus(edge.from, edge.to) === 'correct' ? 1 : 0), 0)
 	);
 
 	/** Mark specific cells as dirty when they change after a check */
@@ -123,10 +118,9 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		const toCell = grid[toIdx];
 		if (!fromCell || !toCell) return 'empty';
 
-		if (validEdgePairs[edgeKey(fromCell.word, toCell.word)]) {
-			return 'correct';
-		}
-		return 'wrong';
+		const fromCorrect = fromCell.word === puzzle.solution[fromIdx].word;
+		const toCorrect = toCell.word === puzzle.solution[toIdx].word;
+		return fromCorrect && toCorrect ? 'correct' : 'wrong';
 	}
 
 	function getEdgeStatus(fromIdx: number, toIdx: number): EdgeStatus {
@@ -222,10 +216,6 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		swapGridCells,
 		reset,
 	};
-}
-
-function edgeKey(firstWord: string, secondWord: string): string {
-	return [firstWord, secondWord].sort().join('::');
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
