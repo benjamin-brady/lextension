@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
 	import { env } from '$env/dynamic/public';
+	import HowToPlay from '$lib/components/HowToPlay.svelte';
 	import { trackPageView } from '../lib/analytics';
 	import '../app.css';
 
@@ -32,12 +33,16 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 </svelte:head>
 
 <div class="min-h-dvh flex flex-col items-center bg-[var(--bg)] text-[var(--text)]">
-	<header class="w-full text-center py-2 border-b border-[var(--border)]">
-		<h1 class="text-2xl font-bold tracking-tight">LexLink</h1>
-		<p class="text-sm text-(--text-muted)">Place the words so connected pairs share a link</p>
-		<nav class="mt-2 flex items-center justify-center gap-2 text-sm">
-			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/">Today</a>
-			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/daily">Daily</a>
+	<header class="w-full py-2 border-b border-[var(--border)]">
+		<div class="flex items-center justify-between max-w-lg mx-auto px-4">
+			<div class="w-10"></div>
+			<div class="text-center">
+				<h1 class="text-2xl font-bold tracking-tight">LexLink</h1>
+			</div>
+			<HowToPlay />
+		</div>
+		<nav class="mt-1 flex items-center justify-center gap-2 text-sm">
+			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/">Daily</a>
 			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/practice">Practice</a>
 		</nav>
 	</header>

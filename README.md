@@ -82,3 +82,13 @@ bun run deploy
 ```
 
 `bun run dev` starts the local app, `bun run check` runs Svelte type checks, and `bun run deploy` builds and deploys with Wrangler.
+
+## Analytics
+
+GA4 is loaded from the app layout when `PUBLIC_GA_MEASUREMENT_ID` is present. This repository is configured with:
+
+- local development via `.env`
+- a tracked example in `.env.example`
+- Cloudflare deployment via `wrangler.toml`
+
+The current measurement ID is `G-4HPSRG5QQ7`.

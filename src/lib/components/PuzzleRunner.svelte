@@ -2,7 +2,6 @@
 	import { createGameState, type GameState } from '$lib/game.svelte';
 	import type { Puzzle } from '$lib/types';
 	import GameBoard from './GameBoard.svelte';
-	import HowToPlay from './HowToPlay.svelte';
 
 	let { puzzle, shareLabel, storageId }: { puzzle: Puzzle; shareLabel: string; storageId: string } = $props();
 
@@ -15,7 +14,6 @@
 
 {#if game}
 	<div class="grid gap-2">
-		<HowToPlay />
-		<GameBoard {game} {puzzle} {shareLabel} />
+		<GameBoard {game} {puzzle} {shareLabel} {storageId} />
 	</div>
 {/if}

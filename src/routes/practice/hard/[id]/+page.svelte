@@ -6,28 +6,6 @@
 </script>
 
 <div class="grid gap-4">
-	<section class="rounded-2xl border border-(--border) bg-(--surface) p-4">
-		<p class="text-xs font-bold uppercase tracking-[0.18em] text-(--text-muted)">Hard mode</p>
-		<h2 class="mt-2 text-xl font-bold">Hard practice puzzle #{data.id}</h2>
-		<p class="mt-1 text-sm text-(--text-muted)">
-			This pool uses less obvious compounds, denser overlap, and slightly sharper wordplay.
-		</p>
-		<div class="mt-4 flex flex-wrap gap-2">
-			<a
-				href="/practice"
-				class="rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 text-sm font-semibold transition-colors hover:border-(--accent)"
-			>
-				All practice
-			</a>
-			<a
-				 href="/daily"
-				class="rounded-lg bg-(--accent) px-3 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-			>
-				Open daily
-			</a>
-		</div>
-	</section>
-
 	{#key data.storageId}
 		<PuzzleRunner puzzle={data.puzzle} storageId={data.storageId} shareLabel={data.shareLabel} />
 	{/key}

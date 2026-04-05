@@ -133,8 +133,7 @@
 
 <svelte:document onkeydown={handleDocumentKeydown} />
 
-<div class="flex justify-end">
-	<button
+<button
 		type="button"
 		class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-(--border) bg-(--surface) text-(--accent) transition-colors hover:border-(--accent) hover:bg-(--surface-light)"
 		onclick={openModal}
@@ -145,8 +144,7 @@
 		title="How to play"
 	>
 		<Info size={18} strokeWidth={2.25} aria-hidden="true" />
-	</button>
-</div>
+</button>
 
 {#if isOpen}
 	<div class="fixed inset-0 z-50 grid place-items-center p-4 sm:p-6">

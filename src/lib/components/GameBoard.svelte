@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { trackEvent } from '$lib/analytics';
 	import type { GameState } from '../game.svelte';
 	import type { Puzzle, WordItem } from '../types';
 	import { ADJACENCIES } from '../types';
 
-	let { game, shareLabel, puzzle }: { game: GameState; shareLabel: string; puzzle: Puzzle } = $props();
+	let { game, shareLabel, puzzle, storageId }: { game: GameState; shareLabel: string; puzzle: Puzzle; storageId: string } = $props();
 
 	type DragItem = {
 		word: WordItem;
@@ -23,6 +24,8 @@
 	let dragOverIndex = $state<number | null>(null);
 	let shareFeedback = $state('');
 	let shareFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
+	let hasObservedSolvedState = false;
+	let previousSolved = false;
 	let solvedLinks = $derived(
 		puzzle.edges.map((edge) => ({
 			from: puzzle.solution[edge.from],
@@ -30,6 +33,17 @@
 			clue: edge.clue
 		}))
 	);
+
+	function baseEventParams(): Record<string, string | number | boolean> {
+		return {
+			puzzle_id: storageId,
+			puzzle_label: shareLabel,
+			correct_words: game.correctCount,
+			correct_links: game.correctEdgeCount,
+			checks: game.checks,
+			solved: game.solved
+		};
+	}
 
 	function onDragStartInventory(e: DragEvent, word: WordItem) {
 		startDrag(e, { word, source: 'inventory' });
@@ -189,6 +203,11 @@
 		}, 2000);
 	}
 
+	function handleCheck() {
+		game.check();
+		trackEvent('puzzle_check', baseEventParams());
+	}
+
 	async function shareResult() {
 		const text = buildShareText();
 		const url = typeof window !== 'undefined' ? window.location.href : undefined;
@@ -199,6 +218,10 @@
 					title: `LexLink ${shareLabel}`,
 					text,
 					url
+				});
+				trackEvent('puzzle_share', {
+					...baseEventParams(),
+					method: 'web_share'
 				});
 				setShareFeedback('Shared');
 				return;
@@ -211,12 +234,27 @@
 
 		if (typeof navigator !== 'undefined' && navigator.clipboard) {
 			await navigator.clipboard.writeText(text);
+			trackEvent('puzzle_share', {
+				...baseEventParams(),
+				method: 'clipboard'
+			});
 			setShareFeedback('Copied');
 			return;
 		}
 
+		trackEvent('puzzle_share_unavailable', baseEventParams());
 		setShareFeedback('Share unavailable');
 	}
+
+	$effect(() => {
+		const solved = game.solved;
+		if (hasObservedSolvedState && solved && !previousSolved) {
+			trackEvent('puzzle_solved', baseEventParams());
+		}
+
+		previousSolved = solved;
+		hasObservedSolvedState = true;
+	});
 
 	// Touch drag support
 	let touchDragItem = $state<{ word: WordItem; source: 'inventory' | 'grid'; gridIndex?: number } | null>(null);
@@ -464,27 +502,29 @@
 		{/each}
 	</div>
 
-	<div class="flex items-center gap-3">
+	<div class="grid gap-3">
 		{#if !game.solved}
 			<button
-				class="cursor-pointer rounded-lg bg-(--accent) px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-				onclick={() => game.check()}
+				class="w-full cursor-pointer rounded-xl bg-(--yellow) px-5 py-4 text-base font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_12px_30px_rgba(234,179,8,0.32)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(234,179,8,0.38)] active:translate-y-0"
+				onclick={handleCheck}
 			>
 				Check
 			</button>
 		{/if}
-		<button
-			class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
-			onclick={shareResult}
-		>
-			Share
-		</button>
-		<button
-			class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
-			onclick={() => game.reset()}
-		>
-			Reset
-		</button>
+		<div class="flex items-center gap-3">
+			<button
+				class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
+				onclick={shareResult}
+			>
+				Share
+			</button>
+			<button
+				class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
+				onclick={() => game.reset()}
+			>
+				Reset
+			</button>
+		</div>
 	</div>
 
 	{#if shareFeedback}
