@@ -1,9 +1,9 @@
 ---
-name: emoji-puzzle-generator
+name: puzzle-generator
 description: Generate LexLink emoji puzzles and 3x3 word-link grids. Use when asked to create, draft, expand, review, or add standard or hard puzzles with word relationships such as common phrases, compounds, containment, rhyme, homophone, derivation, slang, secondary meanings, category links, or other explainable word associations.
 ---
 
-# Emoji Puzzle Generator
+# Puzzle Generator
 
 Use this skill when working on LexLink puzzle generation for this repository.
 
