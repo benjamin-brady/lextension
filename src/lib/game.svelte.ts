@@ -1,13 +1,23 @@
 import { evaluatePuzzleState, getEdgeStatus as getEvaluatedEdgeStatus } from './game-logic';
+import {
+	saveGameRecord,
+	type PersistedStateHistoryEntry,
+} from './game-storage';
 import type { EdgeStatus, NodeStatus, Puzzle, WordItem } from './types';
+import { StateHistory } from 'runed';
 
-interface SavedState {
+interface UndoableState {
 	grid: (string | null)[];
 	inventory: string[];
+}
+
+interface SavedState extends UndoableState {
 	checks: number;
 	cellChecked: boolean[];
 	checkedSnapshot: (string | null)[];
 }
+
+const HISTORY_CAPACITY = 150;
 
 function storageKey(storageId: string): string {
 	return `simicle-game-${storageId}`;
@@ -39,32 +49,44 @@ function saveState(storageId: string, state: SavedState): void {
 export function createGameState(puzzle: Puzzle, storageId: string) {
 	const saved = loadState(storageId);
 	const wordLookup = Object.fromEntries(puzzle.solution.map((w) => [w.word, w]));
+	const normalizedSaved = normalizeSavedState(saved);
 
 	/** Current grid: null means empty slot */
 	let grid = $state<(WordItem | null)[]>(
-		saved ? saved.grid.map((w) => (w ? wordLookup[w] ?? null : null)) : Array(9).fill(null)
+		normalizedSaved ? normalizedSaved.grid.map((w) => (w ? wordLookup[w] ?? null : null)) : Array(9).fill(null)
 	);
 	/** Inventory: words not yet placed */
 	let inventory = $state<WordItem[]>(
-		saved
-			? saved.inventory.map((w) => wordLookup[w]).filter((w): w is WordItem => w != null)
+		normalizedSaved
+			? normalizedSaved.inventory.map((w) => wordLookup[w]).filter((w): w is WordItem => w != null)
 			: shuffleArray([...puzzle.solution])
 	);
-	let checks = $state(saved?.checks ?? 0);
+	let checks = $state(normalizedSaved?.checks ?? 0);
 
 	/** Per-cell: whether the cell has been checked and not changed since */
-	let cellChecked = $state<boolean[]>(saved?.cellChecked ?? Array(9).fill(false));
+	let cellChecked = $state<boolean[]>(normalizedSaved?.cellChecked ?? Array(9).fill(false));
 
 	/** Snapshot of words at each cell at last check time */
-	let checkedSnapshot = $state<(string | null)[]>(saved?.checkedSnapshot ?? Array(9).fill(null));
+	let checkedSnapshot = $state<(string | null)[]>(normalizedSaved?.checkedSnapshot ?? Array(9).fill(null));
+
+	const history = new StateHistory<UndoableState>(
+		() => createUndoableState(),
+		(snapshot) => {
+			applyUndoableState(snapshot);
+		},
+		{ capacity: HISTORY_CAPACITY }
+	);
 
 	$effect(() => {
-		saveState(storageId, {
-			grid: grid.map((c) => c?.word ?? null),
-			inventory: inventory.map((w) => w.word),
+		const snapshot = createSavedState();
+		saveState(storageId, snapshot);
+		void saveGameRecord({
+			storageId,
+			snapshot,
+			history: cloneHistoryLog(history.log),
 			checks,
-			cellChecked: [...cellChecked],
-			checkedSnapshot: [...checkedSnapshot],
+			solved,
+			updatedAt: Date.now(),
 		});
 	});
 
@@ -111,6 +133,28 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 			(e) => (e.from === fromIdx && e.to === toIdx) || (e.from === toIdx && e.to === fromIdx)
 		);
 		return edge?.clue;
+	}
+
+	function createUndoableState(): UndoableState {
+		return {
+			grid: grid.map((cell) => cell?.word ?? null),
+			inventory: inventory.map((word) => word.word),
+		};
+	}
+
+	function createSavedState(): SavedState {
+		return {
+			...createUndoableState(),
+			checks,
+			cellChecked: [...cellChecked],
+			checkedSnapshot: [...checkedSnapshot],
+		};
+	}
+
+	function applyUndoableState(snapshot: UndoableState) {
+		grid = snapshot.grid.map((word) => (word ? wordLookup[word] ?? null : null));
+		inventory = snapshot.inventory.map((word) => wordLookup[word]).filter((word): word is WordItem => word != null);
+		markCellsDirty(Array.from({ length: 9 }, (_, index) => index));
 	}
 
 	function placeWord(gridIndex: number, word: WordItem) {
@@ -167,9 +211,17 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		checks = 0;
 		cellChecked = Array(9).fill(false);
 		checkedSnapshot = Array(9).fill(null);
-		if (typeof localStorage !== 'undefined') {
-			localStorage.removeItem(storageKey(storageId));
+		history.clear();
+		history.log = [{ snapshot: createUndoableState(), timestamp: Date.now() }];
+		saveState(storageId, createSavedState());
+	}
+
+	function undo() {
+		if (!history.canUndo) {
+			return;
 		}
+
+		history.undo();
 	}
 
 	return {
@@ -179,6 +231,7 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		get correctCount() { return correctCount; },
 		get correctEdgeCount() { return correctEdgeCount; },
 		get checks() { return checks; },
+		get canUndo() { return history.canUndo; },
 		get cellChecked() { return cellChecked; },
 		getNodeStatus,
 		getEdgeStatus,
@@ -189,7 +242,38 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		removeFromGrid,
 		moveGridWord,
 		swapGridCells,
+		undo,
 		reset,
+	};
+}
+
+function cloneUndoableState(state: UndoableState): UndoableState {
+	return {
+		grid: [...state.grid],
+		inventory: [...state.inventory],
+	};
+}
+
+function cloneHistoryLog(
+	log: PersistedStateHistoryEntry<UndoableState>[]
+): PersistedStateHistoryEntry<UndoableState>[] {
+	return log.map((entry) => ({
+		timestamp: entry.timestamp,
+		snapshot: cloneUndoableState(entry.snapshot),
+	}));
+}
+
+function normalizeSavedState(state: SavedState | null): SavedState | null {
+	if (!state) {
+		return null;
+	}
+
+	return {
+		grid: Array.from({ length: 9 }, (_, index) => state.grid[index] ?? null),
+		inventory: Array.isArray(state.inventory) ? [...state.inventory] : [],
+		checks: typeof state.checks === 'number' ? state.checks : 0,
+		cellChecked: Array.from({ length: 9 }, (_, index) => Boolean(state.cellChecked[index])),
+		checkedSnapshot: Array.from({ length: 9 }, (_, index) => state.checkedSnapshot[index] ?? null),
 	};
 }
 

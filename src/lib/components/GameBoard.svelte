@@ -12,6 +12,13 @@
 		gridIndex?: number;
 	};
 
+	type SolvedLink = {
+		id: string;
+		from: WordItem;
+		to: WordItem;
+		clue: string;
+	};
+
 	const DRAG_MIME = 'application/x-lexlink-word';
 	const NODE_STATUS_EMOJI = {
 		correct: '🟩',
@@ -22,16 +29,21 @@
 
 	let draggedItem = $state<DragItem | null>(null);
 	let dragOverIndex = $state<number | null>(null);
+	let selectedSolvedLinkId = $state('');
 	let shareFeedback = $state('');
 	let shareFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
 	let hasObservedSolvedState = false;
 	let previousSolved = false;
-	let solvedLinks = $derived(
-		puzzle.edges.map((edge) => ({
+	let solvedLinks = $derived<SolvedLink[]>(
+		puzzle.edges.map((edge, index) => ({
+			id: `${edge.from}-${edge.to}-${index}`,
 			from: puzzle.solution[edge.from],
 			to: puzzle.solution[edge.to],
 			clue: edge.clue
 		}))
+	);
+	let selectedSolvedLink = $derived(
+		solvedLinks.find((link) => link.id === selectedSolvedLinkId) ?? solvedLinks[0] ?? null
 	);
 
 	function wordEmoji(word: WordItem): string {
@@ -366,15 +378,15 @@
 <div class="flex w-full flex-col items-center gap-3 select-none touch-none">
 	<div class="flex w-full flex-col gap-3" style="max-width: {GRID_W}px;">
 		<div class="grid w-full grid-cols-3 gap-3">
-			<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<div class="px-1 py-1 text-center">
 				<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Checks</p>
 				<p class="text-xl font-bold">{game.checks}</p>
 			</div>
-			<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<div class="px-1 py-1 text-center">
 				<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Words</p>
 				<p class="text-xl font-bold">{game.correctCount}/9</p>
 			</div>
-			<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<div class="px-1 py-1 text-center">
 				<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Links</p>
 				<p class="text-xl font-bold">{game.correctEdgeCount}/{ADJACENCIES.length}</p>
 			</div>
@@ -472,19 +484,48 @@
 				<h2 class="text-sm font-bold uppercase tracking-[0.18em] text-(--text-muted)">
 					Why the links work
 				</h2>
-				<div class="mt-3 grid gap-3">
-					{#each solvedLinks as link (`${link.from.word}-${link.to.word}`)}
-						<div class="rounded-xl border border-(--border) bg-(--surface-light) px-3 py-3">
-							<p class="text-sm font-semibold">
-								<span aria-hidden="true">{wordEmoji(link.from)}</span>
-								{link.from.word} →
-								<span aria-hidden="true">{wordEmoji(link.to)}</span>
-								{link.to.word}
+				<p class="mt-1 text-sm text-(--text-muted)">
+					Choose a neighboring pair to see its reasoning.
+				</p>
+				{#if solvedLinks.length > 0}
+					<label class="mt-3 grid gap-2">
+						<span class="text-[11px] font-bold uppercase tracking-[0.18em] text-(--text-muted)">
+							Link
+						</span>
+						<select
+							value={selectedSolvedLink?.id ?? ''}
+							class="w-full cursor-pointer rounded-xl border border-(--border) bg-(--surface-light) px-3 py-3 text-sm font-semibold text-(--text)"
+							aria-label="Choose a link explanation"
+							onchange={(event) => {
+								selectedSolvedLinkId = (event.currentTarget as HTMLSelectElement).value;
+							}}
+						>
+							{#each solvedLinks as link (link.id)}
+								<option value={link.id}>
+									{wordEmoji(link.from)} {link.from.word} → {wordEmoji(link.to)} {link.to.word}
+								</option>
+							{/each}
+						</select>
+					</label>
+
+					{#if selectedSolvedLink}
+						<div
+							class="mt-3 rounded-xl border border-(--accent) bg-(--surface-light) px-4 py-4"
+							aria-live="polite"
+						>
+							<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-(--text-muted)">
+								Selected explanation
 							</p>
-							<p class="mt-1 text-sm text-(--text-muted)">{link.clue}</p>
+							<p class="mt-2 text-sm font-semibold text-(--text)">
+								<span aria-hidden="true">{wordEmoji(selectedSolvedLink.from)}</span>
+								{selectedSolvedLink.from.word} →
+								<span aria-hidden="true">{wordEmoji(selectedSolvedLink.to)}</span>
+								{selectedSolvedLink.to.word}
+							</p>
+							<p class="mt-2 text-sm text-(--text-muted)">{selectedSolvedLink.clue}</p>
 						</div>
-					{/each}
-				</div>
+					{/if}
+				{/if}
 			</section>
 		{/if}
 
@@ -531,6 +572,13 @@
 				</button>
 			{/if}
 			<div class="flex items-center gap-3">
+				<button
+					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent) disabled:cursor-not-allowed disabled:opacity-40"
+					onclick={() => game.undo()}
+					disabled={!game.canUndo}
+				>
+					Undo
+				</button>
 				<button
 					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
 					onclick={() => game.reset()}
