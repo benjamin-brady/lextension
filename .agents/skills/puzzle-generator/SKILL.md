@@ -5,7 +5,7 @@ description: Generate LexLink emoji puzzles and 3x3 word-link grids. Use when as
 
 # Puzzle Generator
 
-Use this skill when working on LexLink puzzle generation for this repository.
+Use this skill when working on LexLink puzzle generation for this repository. When asked to generate or edit multiple puzzles, use subagents to do it in parallel while you review and refine the results.
 
 The goal is to produce a 3x3 puzzle with:
 
@@ -180,6 +180,7 @@ Examples:
 - `tea` -> `gossip`
 - `shade` -> `insult`
 - `cold` -> `illness`
+- `under` -> `weather` (from "under the weather", position the word 'under' underneath 'weather' in the grid)
 - `watch` -> `guard` via noun/verb overlap
 - `pig` -> `lipstick` from "you can't put lipstick on a pig"
 - `oil` -> `door` from a familiar squeaky-door / oiling-the-door saying pattern
