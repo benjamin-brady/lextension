@@ -342,9 +342,9 @@
 	}
 
 	// Grid positioning helpers
-	const SLOT_SIZE = 92;
-	const NODE_SIZE = 72;
-	const GAP = 14;
+	const SLOT_SIZE = 112;
+	const NODE_SIZE = 96;
+	const GAP = 8;
 	const GRID_W = SLOT_SIZE * 3 + GAP * 2;
 	const GRID_H = SLOT_SIZE * 3 + GAP * 2;
 
@@ -428,7 +428,7 @@
 				>
 					{#if cell}
 						<div
-							class="flex h-18 w-18 cursor-grab flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
+							class="flex h-22 w-22 cursor-grab flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
 							style="border-color: {nodeOutline(i)};"
 							role="button"
 							aria-label={`Move ${cell.word}`}
@@ -438,14 +438,14 @@
 							ondragend={onDragEnd}
 							ontouchstart={(e) => onTouchStartGrid(e, i)}
 						>
-							<span aria-hidden="true" class="text-base leading-none">{wordEmoji(cell)}</span>
-							<span class="px-0.5 text-center text-xs leading-tight font-bold">{cell.word}</span>
+							<span aria-hidden="true" class="text-sm leading-none">{wordEmoji(cell)}</span>
+							<span class="px-0.5 text-center text-base leading-tight font-bold">{cell.word}</span>
 						</div>
 					{:else if dragOverIndex === i}
-						<div class="flex h-18 w-18 items-center justify-center rounded-xl border-2 border-dashed border-(--accent) bg-(--surface) opacity-70"></div>
+						<div class="flex h-22 w-22 items-center justify-center rounded-xl border-2 border-dashed border-(--accent) bg-(--surface) opacity-70"></div>
 					{:else}
 						<div
-							class="h-18 w-18 rounded-xl border-2 bg-(--surface) transition-colors"
+							class="h-22 w-22 rounded-xl border-2 bg-(--surface) transition-colors"
 							style="border-color: {nodeOutline(i)};"
 						></div>
 					{/if}
@@ -457,6 +457,15 @@
 		{#if game.solved}
 			<div class="text-center">
 				<p class="text-lg font-bold text-(--green)">Solved! 🎉</p>
+				<button
+					class="mt-2 w-full cursor-pointer rounded-xl bg-(--green) px-5 py-3 text-base font-black uppercase tracking-[0.18em] text-white shadow-[0_12px_30px_rgba(34,197,94,0.32)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(34,197,94,0.38)] active:translate-y-0"
+					onclick={shareResult}
+				>
+					Share Result
+				</button>
+				{#if shareFeedback}
+					<p class="mt-1 text-sm text-(--text-muted)">{shareFeedback}</p>
+				{/if}
 			</div>
 
 			<section class="w-full rounded-2xl border border-(--border) bg-(--surface) p-4">
@@ -524,22 +533,12 @@
 			<div class="flex items-center gap-3">
 				<button
 					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
-					onclick={shareResult}
-				>
-					Share
-				</button>
-				<button
-					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
 					onclick={() => game.reset()}
 				>
 					Reset
 				</button>
 			</div>
 		</div>
-
-		{#if shareFeedback}
-			<p class="text-sm text-(--text-muted)">{shareFeedback}</p>
-		{/if}
 	</div>
 </div>
 

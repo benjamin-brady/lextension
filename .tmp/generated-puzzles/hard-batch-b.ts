@@ -199,7 +199,7 @@ export const HARD_BATCH_B: Puzzle[] = [
 	// Note: Plant flips between factory and organism; Power, Water, House, and Food separate those senses cleanly.
 	{
 		solution: [
-			{ word: 'Green', emoji: '🌿' },
+			{ word: 'Green', emoji: '🟩' },
 			{ word: 'Room', emoji: '🚪' },
 			{ word: 'Party', emoji: '🎉' },
 			{ word: 'House', emoji: '🏠' },
@@ -262,7 +262,7 @@ export const HARD_BATCH_B: Puzzle[] = [
 			{ word: 'Light', emoji: '💡' },
 			{ word: 'House', emoji: '🏠' },
 			{ word: 'Signal', emoji: '📶' },
-			{ word: 'Green', emoji: '🌿' },
+			{ word: 'Green', emoji: '🟩' },
 			{ word: 'Tea', emoji: '🍵' },
 		],
 		edges: [

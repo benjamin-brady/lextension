@@ -32,7 +32,7 @@ const WORD_EMOJIS: Record<string, string> = {
 	Foot: '🦶',
 	Game: '🎮',
 	Gate: '🚪',
-	Green: '🌿',
+	Green: '🟩',
 	Guard: '💂',
 	Hand: '✋',
 	Horse: '🐎',

@@ -16,9 +16,9 @@ The goal is to produce a 3x3 puzzle with:
 
 ## Repo Model
 
-This repo stores puzzles in [src/lib/puzzles.ts](src/lib/puzzles.ts).
+This repo stores puzzles in [../../../src/lib/puzzles.ts](../../../src/lib/puzzles.ts).
 
-The data model is defined in [src/lib/types.ts](src/lib/types.ts):
+The data model is defined in [../../../src/lib/types.ts](../../../src/lib/types.ts):
 
 - `solution`: 9 `WordItem`s in row-major grid order
 - `edges`: 12 adjacent links with `from`, `to`, and `clue`
@@ -242,6 +242,7 @@ Ambiguity review process:
 LexLink displays an emoji for each word. Generate one emoji per word with these rules:
 
 - Prefer a direct, obvious emoji for the intended sense of the word.
+- For abstract or generic senses like colors, shapes, directions, numbers, or simple qualities, prefer a neutral symbol for the concept itself rather than a concrete example of it.
 - Keep emojis distinct within the same board where possible.
 - If a word has multiple senses, choose the emoji that supports the intended clue network.
 - Prefer concrete nouns and concepts that have recognizable emoji support.
@@ -249,10 +250,12 @@ LexLink displays an emoji for each word. Generate one emoji per word with these 
 - Keep two-emoji combinations literal and easy to parse, not cryptic.
 - Do not use more than two emojis for one word unless the user explicitly asks for looser emoji interpretation.
 - If no good single emoji or two-emoji combination exists, use the clearest approximate symbol rather than something clever but confusing.
+- Avoid smuggling in extra meaning through the emoji. Example: `Green` should usually be `🟩`, not `🌿`, unless the intended sense is specifically plant-like or leafy.
 
 Examples:
 
 - `Tea` -> `🍵`
+- `Green` -> `🟩`
 - `King` -> `🤴`
 - `Watch` -> `⌚`
 - `Plant` -> `🪴`
@@ -327,7 +330,7 @@ Before presenting or committing a puzzle, verify:
 
 If the user asks to add the puzzle directly:
 
-- Edit [src/lib/puzzles.ts](src/lib/puzzles.ts).
+- Edit [../../../src/lib/puzzles.ts](../../../src/lib/puzzles.ts).
 - Preserve the existing puzzle object style.
 - Include inline `emoji` values on new words when that is the clearest option.
 - Run `bun run check` after editing.

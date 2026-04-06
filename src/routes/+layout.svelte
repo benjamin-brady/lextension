@@ -35,18 +35,15 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 <div class="min-h-dvh flex flex-col items-center bg-[var(--bg)] text-[var(--text)]">
 	<header class="w-full py-2 border-b border-[var(--border)]">
 		<div class="flex items-center justify-between max-w-lg mx-auto px-4">
-			<div class="w-10"></div>
-			<div class="text-center">
-				<h1 class="text-2xl font-bold tracking-tight">LexLink</h1>
-			</div>
-			<HowToPlay />
+			<h1 class="text-xl font-bold tracking-tight">LexLink</h1>
+			<nav class="flex items-center gap-1 text-sm">
+				<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/">Daily</a>
+				<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/practice">Practice</a>
+				<HowToPlay />
+			</nav>
 		</div>
-		<nav class="mt-1 flex items-center justify-center gap-2 text-sm">
-			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/">Daily</a>
-			<a class="rounded-full px-3 py-1 transition-colors hover:bg-[var(--surface)]" href="/practice">Practice</a>
-		</nav>
 	</header>
-	<main class="flex-1 w-full max-w-lg mx-auto px-4 py-3">
+	<main class="flex-1 w-full max-w-lg mx-auto px-2 py-3">
 		{@render children()}
 	</main>
 </div>
