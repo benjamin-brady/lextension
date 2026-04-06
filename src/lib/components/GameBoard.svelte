@@ -428,7 +428,7 @@
 				>
 					{#if cell}
 						<div
-							class="flex h-18 w-18 cursor-grab flex-col items-center justify-center gap-0.5 rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
+							class="flex h-18 w-18 cursor-grab flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
 							style="border-color: {nodeOutline(i)};"
 							role="button"
 							aria-label={`Move ${cell.word}`}
@@ -438,8 +438,8 @@
 							ondragend={onDragEnd}
 							ontouchstart={(e) => onTouchStartGrid(e, i)}
 						>
-							<span aria-hidden="true" class="text-2xl leading-none">{wordEmoji(cell)}</span>
-							<span class="px-1 text-center text-[11px] leading-tight font-semibold">{cell.word}</span>
+							<span aria-hidden="true" class="text-base leading-none">{wordEmoji(cell)}</span>
+							<span class="px-0.5 text-center text-xs leading-tight font-bold">{cell.word}</span>
 						</div>
 					{:else if dragOverIndex === i}
 						<div class="flex h-18 w-18 items-center justify-center rounded-xl border-2 border-dashed border-(--accent) bg-(--surface) opacity-70"></div>
