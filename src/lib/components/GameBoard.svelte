@@ -49,11 +49,25 @@
 		};
 	}
 
+	function movesLocked(): boolean {
+		return game.solved;
+	}
+
 	function onDragStartInventory(e: DragEvent, word: WordItem) {
+		if (movesLocked()) {
+			e.preventDefault();
+			return;
+		}
+
 		startDrag(e, { word, source: 'inventory' });
 	}
 
 	function onDragStartGrid(e: DragEvent, index: number) {
+		if (movesLocked()) {
+			e.preventDefault();
+			return;
+		}
+
 		const cell = game.grid[index];
 		if (!cell) return;
 		startDrag(e, { word: cell, source: 'grid', gridIndex: index });
@@ -119,6 +133,10 @@
 	}
 
 	function onDragOver(e: DragEvent, index: number) {
+		if (movesLocked()) {
+			return;
+		}
+
 		e.preventDefault();
 		if (e.dataTransfer) {
 			e.dataTransfer.dropEffect = 'move';
@@ -127,6 +145,10 @@
 	}
 
 	function onDragEnter(e: DragEvent, index: number) {
+		if (movesLocked()) {
+			return;
+		}
+
 		e.preventDefault();
 		dragOverIndex = index;
 	}
@@ -138,6 +160,7 @@
 	function onDropGrid(e: DragEvent, index: number) {
 		e.preventDefault();
 		dragOverIndex = null;
+		if (movesLocked()) return;
 		const item = resolveDraggedItem(e);
 		if (!item) return;
 
@@ -152,12 +175,24 @@
 	function onDropInventory(e: DragEvent) {
 		e.preventDefault();
 		dragOverIndex = null;
+		if (movesLocked()) return;
 		const item = resolveDraggedItem(e);
 		if (!item) return;
 		if (item.source === 'grid' && item.gridIndex !== undefined) {
 			game.removeFromGrid(item.gridIndex);
 		}
 		draggedItem = null;
+	}
+
+	function onInventoryDragOver(e: DragEvent) {
+		if (movesLocked()) {
+			return;
+		}
+
+		e.preventDefault();
+		if (e.dataTransfer) {
+			e.dataTransfer.dropEffect = 'move';
+		}
 	}
 
 	function onDragEnd() {
@@ -260,11 +295,26 @@
 		hasObservedSolvedState = true;
 	});
 
+	$effect(() => {
+		if (!game.solved) {
+			return;
+		}
+
+		draggedItem = null;
+		dragOverIndex = null;
+		touchDragItem = null;
+		touchGhost = null;
+	});
+
 	// Touch drag support
 	let touchDragItem = $state<{ word: WordItem; source: 'inventory' | 'grid'; gridIndex?: number } | null>(null);
 	let touchGhost = $state<{ x: number; y: number } | null>(null);
 
 	function onTouchStartInventory(e: TouchEvent, word: WordItem) {
+		if (movesLocked()) {
+			return;
+		}
+
 		e.preventDefault();
 		touchDragItem = { word, source: 'inventory' };
 		const touch = e.touches[0];
@@ -272,6 +322,10 @@
 	}
 
 	function onTouchStartGrid(e: TouchEvent, index: number) {
+		if (movesLocked()) {
+			return;
+		}
+
 		const cell = game.grid[index];
 		if (!cell) return;
 		e.preventDefault();
@@ -281,6 +335,12 @@
 	}
 
 	function onTouchMove(e: TouchEvent) {
+		if (movesLocked()) {
+			touchDragItem = null;
+			touchGhost = null;
+			return;
+		}
+
 		if (!touchDragItem) return;
 		e.preventDefault();
 		const touch = e.touches[0];
@@ -288,7 +348,7 @@
 	}
 
 	function onTouchEnd(e: TouchEvent) {
-		if (!touchDragItem || !touchGhost) {
+		if (movesLocked() || !touchDragItem || !touchGhost) {
 			touchDragItem = null;
 			touchGhost = null;
 			return;
@@ -428,12 +488,14 @@
 				>
 					{#if cell}
 						<div
-							class="flex h-22 w-22 cursor-grab flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
+							class={game.solved
+								? 'flex h-22 w-22 cursor-default flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors'
+								: 'flex h-22 w-22 cursor-grab flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing'}
 							style="border-color: {nodeOutline(i)};"
 							role="button"
 							aria-label={`Move ${cell.word}`}
 							tabindex="-1"
-							draggable="true"
+							draggable={!game.solved}
 							ondragstart={(e) => onDragStartGrid(e, i)}
 							ondragend={onDragEnd}
 							ontouchstart={(e) => onTouchStartGrid(e, i)}
@@ -468,7 +530,7 @@
 				{/if}
 			</div>
 
-			<section class="w-full rounded-2xl border border-(--border) bg-(--surface) p-4">
+			<section class="w-full rounded-2xl border border-(--border) bg-(--surface) p-4 select-text touch-auto">
 				<h2 class="text-sm font-bold uppercase tracking-[0.18em] text-(--text-muted)">
 					Why the links work
 				</h2>
@@ -493,12 +555,7 @@
 			class="flex min-h-12 w-full flex-wrap justify-center gap-2 rounded-xl border border-(--border) bg-(--surface) p-2"
 			data-inventory
 			role="list"
-			ondragover={(e) => {
-				e.preventDefault();
-				if (e.dataTransfer) {
-					e.dataTransfer.dropEffect = 'move';
-				}
-			}}
+			ondragover={onInventoryDragOver}
 			ondrop={onDropInventory}
 		>
 			{#if game.inventory.length === 0}
@@ -508,8 +565,10 @@
 			{/if}
 			{#each game.inventory as word (word.word)}
 				<div
-					class="flex cursor-grab items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors hover:border-(--accent) active:cursor-grabbing"
-					draggable="true"
+					class={game.solved
+						? 'flex cursor-default items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors'
+						: 'flex cursor-grab items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors hover:border-(--accent) active:cursor-grabbing'}
+					draggable={!game.solved}
 					role="listitem"
 					ondragstart={(e) => onDragStartInventory(e, word)}
 					ondragend={onDragEnd}

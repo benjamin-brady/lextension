@@ -151,6 +151,10 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		};
 	}
 
+	function movesLocked(): boolean {
+		return solved;
+	}
+
 	function applyUndoableState(snapshot: UndoableState) {
 		grid = snapshot.grid.map((word) => (word ? wordLookup[word] ?? null : null));
 		inventory = snapshot.inventory.map((word) => wordLookup[word]).filter((word): word is WordItem => word != null);
@@ -158,6 +162,10 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	}
 
 	function placeWord(gridIndex: number, word: WordItem) {
+		if (movesLocked()) {
+			return;
+		}
+
 		if (grid[gridIndex]?.word === word.word) {
 			return;
 		}
@@ -175,6 +183,10 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	}
 
 	function removeFromGrid(gridIndex: number) {
+		if (movesLocked()) {
+			return;
+		}
+
 		const cell = grid[gridIndex];
 		if (cell) {
 			inventory = [...inventory, cell];
@@ -184,6 +196,10 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	}
 
 	function moveGridWord(fromIdx: number, toIdx: number) {
+		if (movesLocked()) {
+			return;
+		}
+
 		if (fromIdx === toIdx) {
 			return;
 		}
@@ -200,6 +216,10 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	}
 
 	function swapGridCells(fromIdx: number, toIdx: number) {
+		if (movesLocked()) {
+			return;
+		}
+
 		const temp = grid[fromIdx];
 		grid[fromIdx] = grid[toIdx];
 		grid[toIdx] = temp;
@@ -217,7 +237,7 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 	}
 
 	function undo() {
-		if (!history.canUndo) {
+		if (movesLocked() || !history.canUndo) {
 			return;
 		}
 
@@ -231,7 +251,7 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		get correctCount() { return correctCount; },
 		get correctEdgeCount() { return correctEdgeCount; },
 		get checks() { return checks; },
-		get canUndo() { return history.canUndo; },
+		get canUndo() { return !solved && history.canUndo; },
 		get cellChecked() { return cellChecked; },
 		getNodeStatus,
 		getEdgeStatus,
