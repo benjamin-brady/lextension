@@ -23,7 +23,7 @@
 	let draggedItem = $state<DragItem | null>(null);
 	let dragOverIndex = $state<number | null>(null);
 	let shareFeedback = $state('');
-	let shareButtonLabel = $state('Share Result');
+	let shareButtonLabel = $state('Share');
 	let shareFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
 	let hasObservedSolvedState = false;
 	let previousSolved = false;
@@ -34,10 +34,6 @@
 			clue: edge.clue
 		}))
 	);
-
-	function wordEmoji(word: WordItem): string {
-		return word.emoji ?? '✨';
-	}
 
 	function baseEventParams(): Record<string, string | number | boolean> {
 		return {
@@ -50,25 +46,11 @@
 		};
 	}
 
-	function movesLocked(): boolean {
-		return game.solved;
-	}
-
 	function onDragStartInventory(e: DragEvent, word: WordItem) {
-		if (movesLocked()) {
-			e.preventDefault();
-			return;
-		}
-
 		startDrag(e, { word, source: 'inventory' });
 	}
 
 	function onDragStartGrid(e: DragEvent, index: number) {
-		if (movesLocked()) {
-			e.preventDefault();
-			return;
-		}
-
 		const cell = game.grid[index];
 		if (!cell) return;
 		startDrag(e, { word: cell, source: 'grid', gridIndex: index });
@@ -134,10 +116,6 @@
 	}
 
 	function onDragOver(e: DragEvent, index: number) {
-		if (movesLocked()) {
-			return;
-		}
-
 		e.preventDefault();
 		if (e.dataTransfer) {
 			e.dataTransfer.dropEffect = 'move';
@@ -146,10 +124,6 @@
 	}
 
 	function onDragEnter(e: DragEvent, index: number) {
-		if (movesLocked()) {
-			return;
-		}
-
 		e.preventDefault();
 		dragOverIndex = index;
 	}
@@ -161,7 +135,6 @@
 	function onDropGrid(e: DragEvent, index: number) {
 		e.preventDefault();
 		dragOverIndex = null;
-		if (movesLocked()) return;
 		const item = resolveDraggedItem(e);
 		if (!item) return;
 
@@ -176,24 +149,12 @@
 	function onDropInventory(e: DragEvent) {
 		e.preventDefault();
 		dragOverIndex = null;
-		if (movesLocked()) return;
 		const item = resolveDraggedItem(e);
 		if (!item) return;
 		if (item.source === 'grid' && item.gridIndex !== undefined) {
 			game.removeFromGrid(item.gridIndex);
 		}
 		draggedItem = null;
-	}
-
-	function onInventoryDragOver(e: DragEvent) {
-		if (movesLocked()) {
-			return;
-		}
-
-		e.preventDefault();
-		if (e.dataTransfer) {
-			e.dataTransfer.dropEffect = 'move';
-		}
 	}
 
 	function onDragEnd() {
@@ -235,13 +196,13 @@
 
 	function setShareFeedback(message: string) {
 		shareFeedback = message;
-		shareButtonLabel = message === 'copied!' ? 'copied!' : 'Share Result';
+		shareButtonLabel = message === 'copied!' ? 'copied!' : 'Share';
 		if (shareFeedbackTimer) {
 			clearTimeout(shareFeedbackTimer);
 		}
 		shareFeedbackTimer = setTimeout(() => {
 			shareFeedback = '';
-			shareButtonLabel = 'Share Result';
+			shareButtonLabel = 'Share';
 		}, 2000);
 	}
 
@@ -314,26 +275,11 @@
 		hasObservedSolvedState = true;
 	});
 
-	$effect(() => {
-		if (!game.solved) {
-			return;
-		}
-
-		draggedItem = null;
-		dragOverIndex = null;
-		touchDragItem = null;
-		touchGhost = null;
-	});
-
 	// Touch drag support
 	let touchDragItem = $state<{ word: WordItem; source: 'inventory' | 'grid'; gridIndex?: number } | null>(null);
 	let touchGhost = $state<{ x: number; y: number } | null>(null);
 
 	function onTouchStartInventory(e: TouchEvent, word: WordItem) {
-		if (movesLocked()) {
-			return;
-		}
-
 		e.preventDefault();
 		touchDragItem = { word, source: 'inventory' };
 		const touch = e.touches[0];
@@ -341,10 +287,6 @@
 	}
 
 	function onTouchStartGrid(e: TouchEvent, index: number) {
-		if (movesLocked()) {
-			return;
-		}
-
 		const cell = game.grid[index];
 		if (!cell) return;
 		e.preventDefault();
@@ -354,12 +296,6 @@
 	}
 
 	function onTouchMove(e: TouchEvent) {
-		if (movesLocked()) {
-			touchDragItem = null;
-			touchGhost = null;
-			return;
-		}
-
 		if (!touchDragItem) return;
 		e.preventDefault();
 		const touch = e.touches[0];
@@ -367,7 +303,7 @@
 	}
 
 	function onTouchEnd(e: TouchEvent) {
-		if (movesLocked() || !touchDragItem || !touchGhost) {
+		if (!touchDragItem || !touchGhost) {
 			touchDragItem = null;
 			touchGhost = null;
 			return;
@@ -421,9 +357,9 @@
 	}
 
 	// Grid positioning helpers
-	const SLOT_SIZE = 112;
-	const NODE_SIZE = 96;
-	const GAP = 8;
+	const SLOT_SIZE = 92;
+	const NODE_SIZE = 72;
+	const GAP = 14;
 	const GRID_W = SLOT_SIZE * 3 + GAP * 2;
 	const GRID_H = SLOT_SIZE * 3 + GAP * 2;
 
@@ -442,189 +378,188 @@
 	ontouchend={onTouchEnd}
 />
 
-<div class="flex w-full flex-col items-center gap-3 select-none touch-none">
-	<div class="flex w-full flex-col gap-3" style="max-width: {GRID_W}px;">
-		<div class="grid w-full grid-cols-3 gap-3">
-			<div class="px-1 py-1 text-center">
-				<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Checks</p>
-				<p class="text-xl font-bold">{game.checks}</p>
-			</div>
-			<div class="px-1 py-1 text-center">
-				<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Words</p>
-				<p class="text-xl font-bold">{game.correctCount}/9</p>
-			</div>
-			<div class="px-1 py-1 text-center">
-				<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Links</p>
-				<p class="text-xl font-bold">{game.correctEdgeCount}/{ADJACENCIES.length}</p>
-			</div>
+<div class="flex flex-col items-center gap-3 select-none touch-none">
+	<div class="grid w-full max-w-sm grid-cols-3 gap-3">
+		<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Checks</p>
+			<p class="text-xl font-bold">{game.checks}</p>
 		</div>
+		<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Words</p>
+			<p class="text-xl font-bold">{game.correctCount}/9</p>
+		</div>
+		<div class="rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-center">
+			<p class="text-[11px] uppercase tracking-[0.18em] text-(--text-muted)">Links</p>
+			<p class="text-xl font-bold">{game.correctEdgeCount}/{ADJACENCIES.length}</p>
+		</div>
+	</div>
 
-		<!-- Grid -->
-		<div
-			class="relative self-center"
-			style="width: {GRID_W}px; height: {GRID_H}px;"
+	<!-- Grid -->
+	<div
+		class="relative"
+		style="width: {GRID_W}px; height: {GRID_H}px;"
+	>
+		<!-- Edges (SVG lines) -->
+		<svg
+			class="absolute inset-0 pointer-events-none"
+			width={GRID_W}
+			height={GRID_H}
 		>
-			<!-- Edges (SVG lines) -->
-			<svg
-				class="absolute inset-0 pointer-events-none"
-				width={GRID_W}
-				height={GRID_H}
-			>
-				{#each ADJACENCIES as [a, b] (`${a}-${b}`)}
-					{@const pa = cellPos(a)}
-					{@const pb = cellPos(b)}
-					<line
-						x1={pa.x + SLOT_SIZE / 2}
-						y1={pa.y + SLOT_SIZE / 2}
-						x2={pb.x + SLOT_SIZE / 2}
-						y2={pb.y + SLOT_SIZE / 2}
-						stroke={edgeColor(a, b)}
-						stroke-width="3"
-						stroke-linecap="round"
-					/>
-				{/each}
-			</svg>
-
-			<!-- Nodes -->
-			{#each Array(9) as _, i (i)}
-				{@const pos = cellPos(i)}
-				{@const cell = game.grid[i]}
-				<div
-					class="absolute flex items-center justify-center"
-					style="
-						left: {pos.x}px;
-						top: {pos.y}px;
-						width: {SLOT_SIZE}px;
-						height: {SLOT_SIZE}px;
-					"
-					data-grid-index={i}
-					role="button"
-					tabindex="0"
-					ondragenter={(e) => onDragEnter(e, i)}
-					ondragover={(e) => onDragOver(e, i)}
-					ondragleave={onDragLeave}
-					ondrop={(e) => onDropGrid(e, i)}
-				>
-					{#if cell}
-						<div
-							class={game.solved
-								? 'flex h-22 w-22 cursor-default flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors'
-								: 'flex h-22 w-22 cursor-grab flex-col items-center justify-center rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing'}
-							style="border-color: {nodeOutline(i)};"
-							role="button"
-							aria-label={`Move ${cell.word}`}
-							tabindex="-1"
-							draggable={!game.solved}
-							ondragstart={(e) => onDragStartGrid(e, i)}
-							ondragend={onDragEnd}
-							ontouchstart={(e) => onTouchStartGrid(e, i)}
-						>
-							<span aria-hidden="true" class="text-sm leading-none">{wordEmoji(cell)}</span>
-							<span class="px-0.5 text-center text-base leading-tight font-bold">{cell.word}</span>
-						</div>
-					{:else if dragOverIndex === i}
-						<div class="flex h-22 w-22 items-center justify-center rounded-xl border-2 border-dashed border-(--accent) bg-(--surface) opacity-70"></div>
-					{:else}
-						<div
-							class="h-22 w-22 rounded-xl border-2 bg-(--surface) transition-colors"
-							style="border-color: {nodeOutline(i)};"
-						></div>
-					{/if}
-				</div>
+			{#each ADJACENCIES as [a, b] (`${a}-${b}`)}
+				{@const pa = cellPos(a)}
+				{@const pb = cellPos(b)}
+				<line
+					x1={pa.x + SLOT_SIZE / 2}
+					y1={pa.y + SLOT_SIZE / 2}
+					x2={pb.x + SLOT_SIZE / 2}
+					y2={pb.y + SLOT_SIZE / 2}
+					stroke={edgeColor(a, b)}
+					stroke-width="3"
+					stroke-linecap="round"
+				/>
 			{/each}
+		</svg>
+
+		<!-- Nodes -->
+		{#each Array(9) as _, i (i)}
+			{@const pos = cellPos(i)}
+			{@const cell = game.grid[i]}
+			<div
+				class="absolute flex items-center justify-center"
+				style="
+					left: {pos.x}px;
+					top: {pos.y}px;
+					width: {SLOT_SIZE}px;
+					height: {SLOT_SIZE}px;
+				"
+				data-grid-index={i}
+				role="button"
+				tabindex="0"
+				ondragenter={(e) => onDragEnter(e, i)}
+				ondragover={(e) => onDragOver(e, i)}
+				ondragleave={onDragLeave}
+				ondrop={(e) => onDropGrid(e, i)}
+			>
+				{#if cell}
+					<div
+						class="flex h-18 w-18 cursor-grab flex-col items-center justify-center gap-0.5 rounded-xl border-2 bg-(--surface-light) transition-colors active:cursor-grabbing"
+						style="border-color: {nodeOutline(i)};"
+						role="button"
+						aria-label={`Move ${cell.word}`}
+						tabindex="-1"
+						draggable="true"
+						ondragstart={(e) => onDragStartGrid(e, i)}
+						ondragend={onDragEnd}
+						ontouchstart={(e) => onTouchStartGrid(e, i)}
+					>
+						<span class="text-sm font-semibold">{cell.word}</span>
+					</div>
+				{:else if dragOverIndex === i}
+					<div class="flex h-18 w-18 items-center justify-center rounded-xl border-2 border-dashed border-(--accent) bg-(--surface) opacity-70"></div>
+				{:else}
+					<div
+						class="h-18 w-18 rounded-xl border-2 bg-(--surface) transition-colors"
+						style="border-color: {nodeOutline(i)};"
+					></div>
+				{/if}
+			</div>
+		{/each}
+	</div>
+
+	<!-- Status -->
+	{#if game.solved}
+		<div class="text-center">
+			<p class="text-lg font-bold text-(--green)">Solved! 🎉</p>
+			<button
+				class="mt-2 cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
+				onclick={shareResult}
+			>
+				{shareButtonLabel}
+			</button>
+			{#if shareFeedback && shareFeedback !== 'copied!'}
+				<p class="mt-1 text-sm text-(--text-muted)">{shareFeedback}</p>
+			{/if}
 		</div>
 
-		<!-- Status -->
-		{#if game.solved}
-			<div class="text-center">
-				<p class="text-lg font-bold text-(--green)">Solved! 🎉</p>
+		<section class="w-full rounded-2xl border border-(--border) bg-(--surface) p-4">
+			<h2 class="text-sm font-bold uppercase tracking-[0.18em] text-(--text-muted)">
+				Why the links work
+			</h2>
+			<div class="mt-3 grid gap-3">
+				{#each solvedLinks as link (`${link.from.word}-${link.to.word}`)}
+					<div class="rounded-xl border border-(--border) bg-(--surface-light) px-3 py-3">
+						<p class="text-sm font-semibold">
+							{link.from.word} → {link.to.word}
+						</p>
+						<p class="mt-1 text-sm text-(--text-muted)">{link.clue}</p>
+					</div>
+				{/each}
+			</div>
+		</section>
+	{/if}
+
+	<!-- Inventory -->
+	<div
+		class="flex min-h-12 w-full flex-wrap justify-center gap-2 rounded-xl border border-(--border) bg-(--surface) p-2"
+		data-inventory
+		role="list"
+		ondragover={(e) => {
+			e.preventDefault();
+			if (e.dataTransfer) {
+				e.dataTransfer.dropEffect = 'move';
+			}
+		}}
+		ondrop={onDropInventory}
+	>
+		{#if game.inventory.length === 0}
+			<p class="self-center text-sm text-(--text-muted)">
+				{game.solved ? 'All words placed!' : 'Drag words back here to rearrange'}
+			</p>
+		{/if}
+		{#each game.inventory as word (word.word)}
+			<div
+				class="flex cursor-grab items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors hover:border-(--accent) active:cursor-grabbing"
+				draggable="true"
+				role="listitem"
+				ondragstart={(e) => onDragStartInventory(e, word)}
+				ondragend={onDragEnd}
+				ontouchstart={(e) => onTouchStartInventory(e, word)}
+			>
+				<span class="text-sm font-semibold">{word.word}</span>
+			</div>
+		{/each}
+	</div>
+
+	<div class="grid gap-3">
+		{#if !game.solved}
+			<button
+				class="w-full cursor-pointer rounded-xl bg-(--yellow) px-5 py-4 text-base font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_12px_30px_rgba(234,179,8,0.32)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(234,179,8,0.38)] active:translate-y-0"
+				onclick={handleCheck}
+			>
+				Check
+			</button>
+		{/if}
+		<div class="flex items-center gap-3">
+			{#if !game.solved}
 				<button
-					class="mt-2 w-full cursor-pointer rounded-xl bg-(--green) px-5 py-3 text-base font-black uppercase tracking-[0.18em] text-white shadow-[0_12px_30px_rgba(34,197,94,0.32)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(34,197,94,0.38)] active:translate-y-0"
+					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
 					onclick={shareResult}
 				>
 					{shareButtonLabel}
 				</button>
-				{#if shareFeedback && shareFeedback !== 'copied!'}
-					<p class="mt-1 text-sm text-(--text-muted)">{shareFeedback}</p>
-				{/if}
-			</div>
-
-			<section class="w-full rounded-2xl border border-(--border) bg-(--surface) p-4 select-text touch-auto">
-				<h2 class="text-sm font-bold uppercase tracking-[0.18em] text-(--text-muted)">
-					Why the links work
-				</h2>
-				<div class="mt-3 grid gap-3">
-					{#each solvedLinks as link (`${link.from.word}-${link.to.word}`)}
-						<div class="rounded-xl border border-(--border) bg-(--surface-light) px-3 py-3">
-							<p class="text-sm font-semibold">
-								<span aria-hidden="true">{wordEmoji(link.from)}</span>
-								{link.from.word} →
-								<span aria-hidden="true">{wordEmoji(link.to)}</span>
-								{link.to.word}
-							</p>
-							<p class="mt-1 text-sm text-(--text-muted)">{link.clue}</p>
-						</div>
-					{/each}
-				</div>
-			</section>
-		{/if}
-
-		<!-- Inventory -->
-		<div
-			class="flex min-h-12 w-full flex-wrap justify-center gap-2 rounded-xl border border-(--border) bg-(--surface) p-2"
-			data-inventory
-			role="list"
-			ondragover={onInventoryDragOver}
-			ondrop={onDropInventory}
-		>
-			{#if game.inventory.length === 0}
-				<p class="self-center text-sm text-(--text-muted)">
-					{game.solved ? 'All words placed!' : 'Drag words back here to rearrange'}
-				</p>
 			{/if}
-			{#each game.inventory as word (word.word)}
-				<div
-					class={game.solved
-						? 'flex cursor-default items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors'
-						: 'flex cursor-grab items-center gap-1.5 rounded-lg border border-(--border) bg-(--surface-light) px-3 py-2 transition-colors hover:border-(--accent) active:cursor-grabbing'}
-					draggable={!game.solved}
-					role="listitem"
-					ondragstart={(e) => onDragStartInventory(e, word)}
-					ondragend={onDragEnd}
-					ontouchstart={(e) => onTouchStartInventory(e, word)}
-				>
-					<span aria-hidden="true" class="text-base leading-none">{wordEmoji(word)}</span>
-					<span class="text-sm font-semibold">{word.word}</span>
-				</div>
-			{/each}
-		</div>
-
-		<div class="grid w-full gap-3">
-			{#if !game.solved}
-				<button
-					class="w-full cursor-pointer rounded-xl bg-(--yellow) px-5 py-4 text-base font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_12px_30px_rgba(234,179,8,0.32)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(234,179,8,0.38)] active:translate-y-0"
-					onclick={handleCheck}
-				>
-					Check
-				</button>
-			{/if}
-			<div class="flex items-center gap-3">
-				<button
-					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent) disabled:cursor-not-allowed disabled:opacity-40"
-					onclick={() => game.undo()}
-					disabled={!game.canUndo}
-				>
-					Undo
-				</button>
-				<button
-					class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
-					onclick={() => game.reset()}
-				>
-					Reset
-				</button>
-			</div>
+			<button
+				class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) px-4 py-2 text-sm transition-colors hover:border-(--accent)"
+				onclick={() => game.reset()}
+			>
+				Reset
+			</button>
 		</div>
 	</div>
+
+	{#if shareFeedback && shareFeedback !== 'copied!'}
+		<p class="text-sm text-(--text-muted)">{shareFeedback}</p>
+	{/if}
 </div>
 
 <!-- Touch drag ghost -->
@@ -633,7 +568,6 @@
 		class="fixed z-50 flex items-center gap-1.5 rounded-lg bg-(--accent) px-3 py-2 text-white shadow-lg pointer-events-none"
 		style="left: {touchGhost.x - 40}px; top: {touchGhost.y - 30}px;"
 	>
-		<span aria-hidden="true" class="text-base leading-none">{wordEmoji(touchDragItem.word)}</span>
 		<span class="text-sm font-semibold">{touchDragItem.word.word}</span>
 	</div>
 {/if}

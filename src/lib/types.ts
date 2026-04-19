@@ -1,6 +1,5 @@
 export interface WordItem {
 	word: string;
-	emoji?: string;
 }
 
 export interface Edge {

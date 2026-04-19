@@ -1,99 +1,5 @@
 import type { Puzzle } from './types';
 
-import { MERGED_HARD_PUZZLES, MERGED_STANDARD_PUZZLES } from './generated-puzzles';
-
-const DEFAULT_WORD_EMOJI = '✨';
-
-const WORD_EMOJIS: Record<string, string> = {
-	Alarm: '🚨',
-	Ball: '⚽',
-	Band: '🎸',
-	Bench: '🪑',
-	Board: '🧩',
-	Boil: '♨️',
-	Box: '📦',
-	Button: '🔘',
-	Car: '🚗',
-	Card: '🃏',
-	Case: '💼',
-	Clear: '✨',
-	Clock: '🕐',
-	Coast: '🏖️',
-	Coat: '🧥',
-	Crown: '👑',
-	Dance: '💃',
-	Dog: '🐕',
-	Drill: '🛠️',
-	Drum: '🥁',
-	Elephant: '🐘',
-	Escape: '🏃',
-	Fairy: '🧚',
-	Fire: '🔥',
-	Floor: '🪩',
-	Food: '🍽️',
-	Foot: '🦶',
-	Game: '🎮',
-	Gate: '🚪',
-	Green: '🟩',
-	Guard: '💂',
-	Hand: '✋',
-	Horse: '🐎',
-	House: '🏠',
-	King: '🤴',
-	Life: '🌱',
-	Line: '➖',
-	Locker: '🔒',
-	Man: '👨',
-	Memory: '🧠',
-	Night: '🌙',
-	Owl: '🦉',
-	Party: '🎉',
-	Plant: '🪴',
-	Pocket: '👖',
-	Power: '⚡',
-	Press: '📰',
-	Race: '🏁',
-	Rail: '🚆',
-	Roll: '🌀',
-	Room: '🛋️',
-	Sea: '🌊',
-	Seat: '💺',
-	Service: '🛎️',
-	Skin: '🧴',
-	Sleeper: '😴',
-	Snow: '❄️',
-	Step: '👣',
-	Stick: '🪵',
-	Storm: '⛈️',
-	Style: '🎨',
-	Suit: '🤵',
-	Tail: '🐒',
-	Tale: '📖',
-	Tea: '🍵',
-	Thunder: '🌩️',
-	Tide: '🌊',
-	Tooth: '🦷',
-	Top: '🔝',
-	Tower: '🗼',
-	Track: '🛤️',
-	Tree: '🌳',
-	Trunk: '🧳',
-	Up: '⬆️',
-	Vice: '🗜️',
-	Watch: '⌚',
-	Water: '💧'
-};
-
-function applyWordEmojis(puzzle: Puzzle): Puzzle {
-	return {
-		...puzzle,
-		solution: puzzle.solution.map((item) => ({
-			...item,
-			emoji: item.emoji ?? WORD_EMOJIS[item.word] ?? DEFAULT_WORD_EMOJI
-		}))
-	};
-}
-
 export const PUZZLES: Puzzle[] = [
 	{
 		solution: [
@@ -419,8 +325,7 @@ export const PUZZLES: Puzzle[] = [
 			{ from: 5, to: 8, clue: 'Food service is logistics wearing an apron.' },
 		],
 	},
-	...MERGED_STANDARD_PUZZLES,
-].map(applyWordEmojis);
+];
 
 export const PRACTICE_PUZZLES: Puzzle[] = PUZZLES;
 
@@ -560,8 +465,16 @@ export const HARD_PRACTICE_PUZZLES: Puzzle[] = [
 			{ from: 5, to: 8, clue: 'An industry of aprons, invoices, and speed.' },
 		],
 	},
-	...MERGED_HARD_PUZZLES,
-].map(applyWordEmojis);
+];
+
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+// 2026-04-08 is Daily #1, making 2026-04-10 Daily #3.
+const DAILY_PUZZLE_EPOCH_MS = Date.UTC(2026, 3, 8);
+
+function getDailyPuzzleIndex(timestamp = Date.now()): number {
+	const daysSincePuzzleEpoch = Math.floor(timestamp / MS_PER_DAY) - Math.floor(DAILY_PUZZLE_EPOCH_MS / MS_PER_DAY);
+	return Math.max(0, daysSincePuzzleEpoch);
+}
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 // 2026-04-08 is Daily #1, making 2026-04-10 Daily #3.
