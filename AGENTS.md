@@ -16,3 +16,12 @@
 - Direct Wrangler invocation: `bunx wrangler deploy`
 
 When I say something like "ship it", commit JUST your changes, push to main and then run `bun run deploy` to deploy to production.
+
+## Commit Messages
+
+Use semantic commit messages. For example:
+
+- `feat: add new agent for data analysis`
+- `fix: correct bug in agent response handling`
+
+Always include the ai agent, model, provider details etc in the commit message.
