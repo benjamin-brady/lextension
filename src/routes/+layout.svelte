@@ -31,7 +31,7 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 <svelte:head>
 	{#if gaMeasurementId}
 		<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
-		<script>{gaBootstrapScript}</script>
+		{@html `<script>${gaBootstrapScript}<\/script>`}
 	{/if}
 </svelte:head>
 

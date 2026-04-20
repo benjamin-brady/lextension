@@ -38,6 +38,13 @@ function saveState(storageId: string, state: SavedState): void {
 export function createGameState(puzzle: Puzzle, storageId: string) {
 	const saved = loadState(storageId);
 	const wordLookup = Object.fromEntries(puzzle.solution.map((w) => [w.word, w]));
+	const validLinks = new Set(
+		puzzle.edges.map(({ from, to }) => {
+			const a = puzzle.solution[from].word;
+			const b = puzzle.solution[to].word;
+			return [a, b].sort().join('::');
+		})
+	);
 
 	/** Current grid: null means empty slot */
 	let grid = $state<(WordItem | null)[]>(
@@ -118,9 +125,8 @@ export function createGameState(puzzle: Puzzle, storageId: string) {
 		const toCell = grid[toIdx];
 		if (!fromCell || !toCell) return 'empty';
 
-		const fromCorrect = fromCell.word === puzzle.solution[fromIdx].word;
-		const toCorrect = toCell.word === puzzle.solution[toIdx].word;
-		return fromCorrect && toCorrect ? 'correct' : 'wrong';
+		const key = [fromCell.word, toCell.word].sort().join('::');
+		return validLinks.has(key) ? 'correct' : 'wrong';
 	}
 
 	function getEdgeStatus(fromIdx: number, toIdx: number): EdgeStatus {
