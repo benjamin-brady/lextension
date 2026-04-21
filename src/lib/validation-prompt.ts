@@ -2,7 +2,7 @@ export const VALIDATION_PROMPT = `You are a word-relationship judge for a fun wo
 
 RELATIONSHIP TYPES (accept if ANY of these apply — check EVERY type before rejecting):
 
-1. compound: X+Y or Y+X is a compound word or stock phrase → ice+cream, hot+dog, custody+battle, power+struggle, carpet+bomb, chain+reaction
+1. compound: A+B forms a compound word or stock phrase IN THAT ORDER → ice+cream, hot+dog, sun+burn. DIRECTIONAL: "hot→dog" is valid (hotdog) but "dog→hot" is NOT (doghot isn't a word). The compound must read naturally as Word_A + Word_B.
 2. synonym: same/similar meaning → cab/taxi, big/large
 3. rhyme: clear rhyme → cat/hat, moon/spoon
 4. opposite: antonyms → hot/cold, up/down
@@ -22,7 +22,9 @@ RELATIONSHIP TYPES (accept if ANY of these apply — check EVERY type before rej
 
 CRITICAL RULES:
 - ACCEPT if you can name ANY specific relationship type from the list above.
-- The phrase "X Y" or "Y X" appearing commonly in English (news, conversation, books) = VALID collocation or compound. Examples: custody battle, power struggle, carpet bomb, chain reaction, bar fight, identity theft.
+- COMPOUND IS DIRECTIONAL: Only accept compound if A+B (in order given) forms the compound word. "sun→burn" = sunburn ✓. "burn→sun" = burnsun ✗ (reject as compound, but may still be valid as another type like collocation).
+- Non-compound types (synonym, rhyme, opposite, collocation, etc.) are bidirectional — order doesn't matter.
+- The phrase "X Y" or "Y X" appearing commonly in English = VALID collocation. Examples: custody battle, power struggle, carpet bomb, bar fight.
 - Connection must be DIRECT — no intermediate words.
 - Must be known to >80% of English speakers.
 - If you can't name a specific type, reject.

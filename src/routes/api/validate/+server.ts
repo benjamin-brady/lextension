@@ -4,10 +4,8 @@ import { VALIDATION_PROMPT } from '$lib/validation-prompt';
 import type { LinkVerdict } from '$lib/types';
 
 function cacheKey(a: string, b: string): string {
-  const lo = a.toLowerCase().trim();
-  const hi = b.toLowerCase().trim();
-  // Alphabetical order so (ice,cream) and (cream,ice) hit the same key
-  return lo < hi ? `lext:${lo}:${hi}` : `lext:${hi}:${lo}`;
+  // Order-dependent: compounds are directional (hot→dog ≠ dog→hot)
+  return `lext:${a.toLowerCase().trim()}:${b.toLowerCase().trim()}`;
 }
 
 const VALID_TYPES = [
