@@ -46,6 +46,18 @@
 	</main>
 	<footer class="w-full border-t-2 border-(--ink) bg-(--bg-raised) mt-6">
 		<div class="w-full max-w-md mx-auto px-4 py-4 flex flex-col items-center gap-3">
+			<a href="https://ko-fi.com/benbob" target="_blank" rel="noopener noreferrer"
+				class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border-2 border-(--ink) px-3 py-1.5 shadow-[2px_2px_0_0_var(--ink)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-(--accent) text-white">
+				<span aria-hidden="true">☕</span>
+				<span>Buy me a coffee</span>
+			</a>
+			<nav class="flex items-center gap-3 text-xs text-(--text-muted)">
+				<a class="hover:text-(--accent) transition-colors" href="https://discord.gg/AWfvmFWBcA" target="_blank" rel="noopener noreferrer">Discord</a>
+				<span aria-hidden="true">·</span>
+				<a class="hover:text-(--accent) transition-colors" href="/terms">Terms</a>
+				<span aria-hidden="true">·</span>
+				<a class="hover:text-(--accent) transition-colors" href="/privacy">Privacy</a>
+			</nav>
 			<p class="text-[10px] text-(--text-muted)">Made with ☕ by Ben Brady</p>
 		</div>
 	</footer>
