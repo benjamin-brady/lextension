@@ -10,8 +10,12 @@ interface SavedState {
 	checkedSnapshot: (string | null)[];
 }
 
+// Bump this when the saved-state schema changes or we want to invalidate all
+// existing browser saves (alpha, so we can freely discard).
+const STORAGE_VERSION = 'v2';
+
 function storageKey(storageId: string): string {
-	return `simicle-game-${storageId}`;
+	return `simicle-game-${STORAGE_VERSION}-${storageId}`;
 }
 
 function freshState(puzzle: Puzzle): SavedState {
