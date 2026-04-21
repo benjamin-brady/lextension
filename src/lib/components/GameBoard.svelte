@@ -611,6 +611,30 @@
 			>
 				Reset
 			</button>
+			<button
+				type="button"
+				class="ml-auto cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) p-2 transition-colors hover:border-(--accent)"
+				title="I liked this puzzle"
+				aria-label="Thumbs up"
+				onclick={() => {
+					feedbackSentiment = 'up';
+					feedbackOpen = true;
+				}}
+			>
+				👍
+			</button>
+			<button
+				type="button"
+				class="cursor-pointer rounded-lg border border-(--border) bg-(--surface-light) p-2 transition-colors hover:border-(--accent)"
+				title="Report a problem with this puzzle"
+				aria-label="Thumbs down"
+				onclick={() => {
+					feedbackSentiment = 'down';
+					feedbackOpen = true;
+				}}
+			>
+				👎
+			</button>
 		</div>
 	</div>
 
