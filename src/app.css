@@ -120,7 +120,7 @@ body::before {
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
 
-	/* LexLink custom tokens (declared last to win over shadcn overrides above) */
+	/* Lextension custom tokens (declared last to win over shadcn overrides above) */
 	--bg: #14141c;
 	--bg-raised: #1c1c28;
 	--surface: #23232f;

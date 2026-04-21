@@ -3,6 +3,10 @@ compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 main = ".svelte-kit/cloudflare/_worker.js"
 
+routes = [
+  { pattern = "lextension.net", custom_domain = true },
+]
+
 [vars]
 PUBLIC_GA_MEASUREMENT_ID = ""
 
