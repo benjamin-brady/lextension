@@ -34,6 +34,7 @@
 				<span class="font-display text-3xl font-black tracking-tight leading-none">
 					<span>Lex</span><span class="italic text-(--accent)">tension</span>
 				</span>
+				<span class="text-[10px] font-bold uppercase tracking-wider text-(--accent) border border-(--accent) rounded px-1 py-px leading-tight mb-0.5">alpha</span>
 			</a>
 			<div class="flex items-center gap-2">
 				<ThemeToggle />
