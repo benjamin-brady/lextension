@@ -20,7 +20,7 @@ async function validatePairWithLLM(a: string, b: string, apiKey: string): Promis
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'openai/gpt-4o-mini',
+      model: 'openai/gpt-oss-20b:nitro',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
       max_tokens: 200,

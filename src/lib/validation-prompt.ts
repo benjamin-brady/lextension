@@ -10,7 +10,7 @@ Given two English words, decide if they share a DIRECT, well-known relationship 
 - object-role: X naturally belongs to, is worn by, or associated with Y (e.g. crown/king, bone/dog)
 - material: X is made from Y or vice versa (e.g. flour/bread, grape/wine)
 - verb-object: X is an action commonly done to/with Y (e.g. swing/axe, ride/horse, chop/wood)
-- collocation: X and Y commonly appear together in a well-known phrase (e.g. mother/ship, red/carpet)
+- collocation: X and Y commonly appear together in a well-known phrase (e.g. custody/battle, bar/fight, software/bug, red/carpet, identity/theft, blind/spot)
 - cause-effect: X directly causes or leads to Y (e.g. spark/fire, rain/flood)
 - cultural-pair: iconic duo or fixed idiom (e.g. salt/pepper, lock/key)
 - slang: X is widely-known slang for Y (e.g. wheels/car, GOAT/greatest)
