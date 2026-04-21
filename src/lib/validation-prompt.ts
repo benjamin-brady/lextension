@@ -2,7 +2,7 @@ export const VALIDATION_PROMPT = `You are a word-relationship judge for a fun wo
 
 RELATIONSHIP TYPES (accept if ANY of these apply — check EVERY type before rejecting):
 
-1. compound: A+B forms a compound word or stock phrase IN THAT ORDER → ice+cream, hot+dog, sun+burn. DIRECTIONAL: "hot→dog" is valid (hotdog) but "dog→hot" is NOT (doghot isn't a word). The compound must read naturally as Word_A + Word_B.
+1. compound: STRICT ORDER TEST — concatenate A+B: is "{a}{b}" a real compound word? If YES → accept. If NO → reject as compound (check other types instead). Examples: A="hot" B="dog" → "hotdog" ✓ valid. A="dog" B="hot" → "doghot" ✗ not a word, REJECT as compound. A="sun" B="burn" → "sunburn" ✓. A="burn" B="sun" → "burnsun" ✗ REJECT as compound. Do NOT accept a compound just because B+A would work — only A+B in exactly that order counts.
 2. synonym: same/similar meaning → cab/taxi, big/large
 3. rhyme: clear rhyme → cat/hat, moon/spoon
 4. opposite: antonyms → hot/cold, up/down
@@ -22,7 +22,7 @@ RELATIONSHIP TYPES (accept if ANY of these apply — check EVERY type before rej
 
 CRITICAL RULES:
 - ACCEPT if you can name ANY specific relationship type from the list above.
-- COMPOUND IS DIRECTIONAL: Only accept compound if A+B (in order given) forms the compound word. "sun→burn" = sunburn ✓. "burn→sun" = burnsun ✗ (reject as compound, but may still be valid as another type like collocation).
+- COMPOUND ORDER TEST: Ask yourself "Is {a}{b} a real word/phrase?" If not, it is NOT a compound. Do NOT reverse the order. "{a}{b}" only.
 - Non-compound types (synonym, rhyme, opposite, collocation, etc.) are bidirectional — order doesn't matter.
 - The phrase "X Y" or "Y X" appearing commonly in English = VALID collocation. Examples: custody battle, power struggle, carpet bomb, bar fight.
 - Connection must be DIRECT — no intermediate words.

@@ -71,7 +71,7 @@ function parseLLMResponse(a: string, b: string, raw: string): LinkVerdict {
 }
 
 async function validatePairWithLLM(a: string, b: string, apiKey: string): Promise<LinkVerdict> {
-  const prompt = VALIDATION_PROMPT.replace('{a}', a).replace('{b}', b);
+  const prompt = VALIDATION_PROMPT.replaceAll('{a}', a).replaceAll('{b}', b);
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
