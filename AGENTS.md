@@ -24,4 +24,4 @@ Use semantic commit messages. For example:
 - `feat: add new agent for data analysis`
 - `fix: correct bug in agent response handling`
 
-Always include the ai agent, model, provider details etc in the commit message.
+Commit as the usual git user. Always include the ai agent, model, provider details etc in the commit message.
