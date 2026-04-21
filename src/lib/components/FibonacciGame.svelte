@@ -54,6 +54,11 @@
     const word = inputValue.trim();
     if (!word || game.isValidating || game.isComplete) return;
 
+    if (/\s/.test(word)) {
+      game.error = 'One word only — no spaces!';
+      return;
+    }
+
     if (game.chain.some((w: string) => w.toLowerCase() === word.toLowerCase())) {
       game.error = `"${word}" is already in the chain`;
       return;

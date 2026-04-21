@@ -117,10 +117,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     return json({ error: 'Words must be 30 characters or less' }, { status: 400 });
   }
 
-  // Sanitize: only allow letters, hyphens, spaces, apostrophes
-  const wordPattern = /^[a-zA-Z\s'-]+$/;
+  // Sanitize: single word only, letters/hyphens/apostrophes (no spaces)
+  const wordPattern = /^[a-zA-Z'-]+$/;
   if (!wordPattern.test(a) || !wordPattern.test(b)) {
-    return json({ error: 'Words must contain only letters' }, { status: 400 });
+    return json({ error: 'One word only — no spaces or special characters' }, { status: 400 });
   }
 
   if (a.toLowerCase() === b.toLowerCase()) {
