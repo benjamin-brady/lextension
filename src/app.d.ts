@@ -4,7 +4,7 @@ declare global {
 		interface Platform {
 			env: {
 				LINK_CACHE: KVNamespace;
-				AI_API_KEY?: string;
+				OPENROUTER_API_KEY?: string;
 			};
 			cf?: {
 				country?: string;

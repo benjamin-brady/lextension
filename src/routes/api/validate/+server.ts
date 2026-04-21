@@ -125,7 +125,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
   }
 
   const kv = platform?.env?.LINK_CACHE;
-  const apiKey = platform?.env?.AI_API_KEY;
+  const apiKey = platform?.env?.OPENROUTER_API_KEY;
 
   if (!apiKey) {
     return json({ error: 'AI validation not configured' }, { status: 503 });
