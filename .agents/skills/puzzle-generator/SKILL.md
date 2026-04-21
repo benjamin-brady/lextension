@@ -5,7 +5,7 @@ description: Generate LexLink emoji puzzles and 3x3 word-link grids. Use when as
 
 # Puzzle Generator
 
-Use this skill when working on LexLink puzzle generation for this repository. When asked to generate or edit multiple puzzles, use subagents to do it in parallel while you review and refine the results.
+Use this skill when working on LexLink puzzle generation for this repository.
 
 The goal is to produce a 3x3 puzzle with:
 
@@ -13,6 +13,8 @@ The goal is to produce a 3x3 puzzle with:
 - 12 valid horizontal and vertical links
 - 1 short explanation per link
 - 1 clear emoji per word
+- Every edge classified by relation type
+- No junk edges
 
 ## Repo Model
 
@@ -36,295 +38,512 @@ Grid adjacency is fixed:
 
 Every puzzle must define all 12 horizontal and vertical links.
 
+---
+
 ## Relation Taxonomy
 
-Before generating a puzzle, classify each candidate edge by the kind of relation it uses. Strong puzzles mix a few relation types, but each individual edge should have one dominant explanation.
+Every edge MUST be classified with exactly one relation type from this taxonomy. If you cannot cleanly assign a type, the edge is junk — reject it.
 
-### Strongest relation families
+### A-Tier: Strongest Relations
 
-These are usually easiest for players to validate after the reveal.
+These are immediately obvious to players. Prefer these. Every board needs at least 6 A-tier edges.
 
-1. `x y` is a common phrase or compound
+#### 1. Compound / Phrase
+`x y` or `y x` is a recognized compound word or common phrase.
 
-- `tea` + `party` -> `tea party`
-- `tree` + `house` -> `tree house`
-- `memory` + `card` -> `memory card`
-- `dog` + `house` -> `doghouse`
+- `tea` + `party` → tea party
+- `watch` + `dog` → watchdog
+- `ice` + `cream` → ice cream
+- `green` + `house` → greenhouse
+- `sun` + `flower` → sunflower
 
-2. `x` is used for `y`, belongs to `y`, or naturally goes with `y`
+**Test:** Would a dictionary or common usage list this compound? If you have to argue for it, it fails.
 
-- `king` -> `crown`
-- `car` -> `trunk`
-- `watch` -> `band`
-- `bench` -> `seat`
+#### 2. Object–Role / Goes-With
+`x` naturally belongs to, is worn by, is part of, or is used with `y`.
 
-3. `x` is a type of `y`, member of `y`, or category example of `y`
+- `king` → `crown` (kings wear crowns)
+- `car` → `trunk` (cars have trunks)
+- `watch` → `band` (watches have bands)
+- `pen` → `ink` (pens use ink)
 
-- `owl` -> `bird`
-- `emerald` -> `gem`
-- `poodle` -> `dog`
-- `tea` -> `drink`
+**Test:** If you showed someone X, would they immediately think of Y as something X has/uses/wears?
 
-4. `x` causes, produces, uses, or affects `y`
+#### 3. Part–Whole
+`x` is a component or section of `y`, or `y` contains `x` as a part.
 
-- `storm` -> `thunder`
-- `plant` -> `food`
-- `fire` -> `alarm`
-- `drill` -> `hole`
+- `wheel` → `car`
+- `petal` → `flower`
+- `chapter` → `book`
+- `brick` → `wall`
 
-### Good secondary relation families
+**Test:** "A Y has an X" or "X is part of a Y" sounds natural.
 
-These are useful, but should be supported by clear clues and not dominate the whole board.
+#### 4. Material / Made-Of
+`x` is made from `y`, or `y` is composed of `x`.
 
-5. `x` contains `y`, starts with `y`, ends with `y`, or hides `y`
+- `bird` → `feathers` (birds are made of feathers)
+- `ice` → `water` (ice is frozen water)
+- `bread` → `flour` (bread is made from flour)
+- `glass` → `sand` (glass is made from sand)
+- `wine` → `grape` (wine is made from grapes)
+
+**Test:** "X is made of/from Y" is a true, commonly known fact.
+
+#### 5. Tool–Action / Performer–Output
+`x` is the tool or performer, `y` is what it does or produces (or vice versa).
+
+- `hammer` → `nail`
+- `brush` → `paint`
+- `baker` → `bread`
+- `painter` → `painting`
+- `camera` → `photo`
+
+**Test:** "X is used for Y" or "X makes Y" is immediately clear.
+
+#### 6. Cause–Effect
+`x` causes, produces, or leads to `y`.
+
+- `rain` → `flood`
+- `spark` → `fire`
+- `storm` → `thunder`
+- `fire` → `smoke`
+
+**Test:** "X causes Y" or "X leads to Y" is a known, direct relationship.
+
+#### 7. Cultural Pair / Idiom
+`x` and `y` are an iconic pair, proverb duo, or fixed idiom.
+
+- `salt` + `pepper`
+- `thunder` + `lightning`
+- `Romeo` + `Juliet`
+- `trial` + `error`
+- `lock` + `key`
+- `needle` + `haystack`
+
+**Test:** Saying X almost automatically makes someone think of Y.
+
+### B-Tier: Good Secondary Relations
+
+Useful for variety. No more than 4 B-tier edges per board.
+
+#### 8. Category Siblings
+Both `x` and `y` belong to the same well-defined category.
+
+- `running` + `swimming` (both sports)
+- `oak` + `elm` (both trees)
+- `Mars` + `Venus` (both planets)
+- `piano` + `guitar` (both instruments)
+
+**Test:** You can name the shared category in one word. "Both are ___." If the category is vague ("both are things", "both are nouns"), it fails.
+
+#### 9. Rhyme
+`x` and `y` rhyme clearly.
+
+- `clock` / `sock`
+- `cat` / `hat`
+- `moon` / `spoon`
+- `cake` / `lake`
+
+**Test:** They rhyme. Obviously. Near-rhymes only if very close (e.g. `love` / `dove`).
+
+#### 10. Homophone
+`x` and `y` sound the same but are spelled differently.
+
+- `tail` / `tale`
+- `night` / `knight`
+- `flour` / `flower`
+- `bare` / `bear`
+
+**Test:** Pronounced identically or near-identically.
+
+#### 11. Anagram
+The letters of `x` rearrange to spell `y`.
+
+- `listen` ↔ `silent`
+- `race` ↔ `care`
+- `earth` ↔ `heart`
+- `dusty` ↔ `study`
+
+**Test:** Same letters, different order. Must be exact.
+
+#### 12. Opposite / Antonym
+`x` is the clear opposite or counterpart of `y`.
+
+- `hot` / `cold`
+- `night` / `day`
+- `question` / `answer`
+- `buyer` / `seller`
+
+**Test:** A thesaurus would list them as antonyms.
+
+#### 13. Sequence / Progression / State Change
+`x` becomes `y` through a natural process, or they are adjacent steps.
+
+- `egg` → `chicken`
+- `seed` → `tree`
+- `water` → `ice` (freezing)
+- `grape` → `wine` (fermentation)
+- `caterpillar` → `butterfly`
+
+**Test:** There is a known, nameable process that turns X into Y.
+
+#### 14. Containment / Hidden Word
+`x` is literally inside the spelling of `y`, or a compound of `x` + another word contains `y`.
 
 - `greenhouse` contains `green`
 - `fireman` contains `fire`
-- `toothbrush` starts with `tooth`
-- `seahorse` ends with `horse`
+- `seahorse` contains `horse`
+- `carpet` contains `car` and `pet`
 
-6. `x` is made from `y`, derived from `y`, or is a converted form of `y`
+**Test:** You can point to the letters.
 
-- `wooden` from `wood`
-- `singer` from `sing`
-- `runner` from `run`
-- `childhood` from `child`
+#### 15. Location / Habitat
+`x` lives in, is found at, or is associated with place `y`.
 
-7. `x` and `y` are sound-linked
+- `fish` → `ocean`
+- `bear` → `forest`
+- `camel` → `desert`
+- `penguin` → `ice`
 
-- rhyme: `clock` / `sock`
-- homophone: `tail` / `tale`
-- near-homophone: only if the clue can justify it cleanly
+**Test:** "Where do you find X?" → "Y" is immediate.
 
-8. `x` is slang, nickname, abbreviation, or informal label for `y`
+#### 16. Collective Noun / Group
+`x` is the collective noun for a group of `y`.
 
-- `wheels` -> `car`
-- `threads` -> `clothes`
-- `phone` -> `cell`
-- `math` -> `mathematics`
+- `pride` → `lions`
+- `murder` → `crows`
+- `flock` → `birds`
+- `pack` → `wolves`
 
-9. `x` is the opposite, counterpart, or paired role of `y`
+**Test:** "A X of Y" is the standard collective form.
 
-- `question` / `answer`
-- `lock` / `key`
-- `buyer` / `seller`
-- `night` / `day`
+### C-Tier: Use Sparingly
 
-10. `x` and `y` are linked by a common title, proverb, idiom, or cultural phrase
+Maximum 2 C-tier edges per board. These must be supported by very clear clues.
 
-- `beauty` / `beast`
-- `salt` / `pepper`
-- `thunder` / `lightning`
-- `trial` / `error`
+#### 17. Double Meaning / Polysemy
+`x` has a secondary meaning that links to `y` in a non-obvious way.
 
-11. `x` has a secondary sense, figurative meaning, or alternate reading that links to `y`
+- `bank` (river) / `bank` (money)
+- `bat` (animal) / `bat` (cricket)
+- `watch` → `guard` (verb sense overlap)
+- `shade` → `insult`
 
-- `dirt` -> `gossip`
-- `tea` -> `gossip`
-- `cold` -> `illness`
-- `shade` -> `insult`
+**Test:** The secondary meaning is in common dictionaries, not slang dictionaries.
 
-### Riskier relation families
+#### 18. Slang / Informal
+`x` is slang, nickname, or informal shorthand for `y`.
 
-Use these sparingly. They can work, but they become flimsy quickly.
+- `wheels` → `car`
+- `threads` → `clothes`
+- `digits` → `phone number`
+- `tea` → `gossip`
 
-12. Loose thematic association
+**Test:** Most English speakers would recognize the slang usage without explanation.
 
-- `beach` / `summer`
-- `school` / `pencil`
+#### 19. Symbol / Represents
+`x` symbolically represents `y` in widespread culture.
 
-13. Multi-step trivia or knowledge chains
+- `dove` → `peace`
+- `crown` → `royalty`
+- `skull` → `danger`
+- `heart` → `love`
 
-- `Mercury` -> `messenger` -> `wings`
+**Test:** The symbolism is globally recognized, not niche.
 
-14. Private slang, niche fandom references, or region-specific shorthand
+### REJECTED: Not Valid Relation Types
 
-- only use if the target audience would reliably know it
+These are NOT acceptable as edge justifications:
 
-## Quality Bar For Relations
+- **Loose thematic association:** "beach" / "summer" — too vague
+- **Multi-step trivia chains:** "Mercury → messenger → wings" — requires hops
+- **"Both are nouns" / "Both can be adjectives":** — not a relationship
+- **Private slang / niche fandom:** — audience won't know it
+- **Vibes-based connections:** "they feel related" — not a relation
 
-Each edge should pass these checks:
+---
 
-- The relation can be explained in one sentence.
-- A reasonable player would accept the explanation immediately after reveal.
-- The clue identifies one main relationship, not two or three stacked together.
-- The edge does not depend on obscure trivia unless the whole puzzle intentionally does.
-- The edge would still make sense if shown on its own outside the grid.
+## Hard Reject Rules
 
-Prefer this order of confidence:
+An edge is **junk** and must be discarded if ANY of these are true:
 
-1. Common phrase or compound
-2. Natural object-role or use relationship
-3. Category-member or type-of link
-4. Clear derivation, containment, or sound relation
-5. Slang or cultural expression
-6. Common secondary meaning or figurative sense
-7. Loose thematic association
+1. **Can't classify it.** If it doesn't fit cleanly into one taxonomy type, it's out.
+2. **Multi-sentence explanation.** If justifying the link takes more than one sentence, it's too weak.
+3. **Hedging language.** If the clue needs "could be seen as", "in a way", "loosely", "sort of" — it's out.
+4. **Multi-hop reasoning.** If you need A→B→C to explain why A links to C — it's out.
+5. **Requires obscure knowledge.** If < 80% of English speakers would get it — it's out.
+6. **Generic connector.** If either word could link to 5+ other words on the same board equally well — the word is too generic.
+7. **Reverse test failure.** Show someone the two words and the clue. Could they distinguish this pair from a random pairing? If no — it's out.
+8. **Clue depends on a third word.** The clue should work from just the two endpoint words.
+
+---
+
+## Board-Level Quality Gates
+
+A complete puzzle must pass ALL of these before it's accepted:
+
+1. **Minimum 3 distinct relation types** across the 12 edges.
+2. **No single relation type on more than 6 edges** (50%).
+3. **At least 6 A-tier edges.**
+4. **No more than 2 C-tier edges.**
+5. **Every word participates in at least 1 A-tier edge.**
+6. **No word connects plausibly to more than 4 other words** in the set (intended + unintended).
+7. **No plausible alternate solution** — swapping 2-3 words should not produce an equally convincing board.
+8. **The board has anchors** — at least 2 A-tier edges using Compound/Phrase or Cultural Pair, so players have obvious footholds.
+
+Note: 6 A-tier + 4 B-tier + 2 C-tier = 12 exactly. The math is tight. If a puzzle has 6 A, 5 B, 1 C, that's still valid (at most 6 of one type, at most 2 C-tier). Aim for 7-8 A-tier if possible — it leaves room to drop a weak edge during review.
+
+---
 
 ## Hard Puzzle Guidance
 
-Hard puzzles may use more complex relationships than standard puzzles, but they still need to feel fair after the reveal.
+Hard puzzles may lean more on B and C-tier relations, but they still need to feel fair after the reveal.
 
-Good hard-puzzle ingredients:
+Hard puzzle allowances:
 
-- common double meanings
-- figurative or idiomatic senses
-- links drawn from familiar English-language sayings or proverbs
-- slang that is broad enough to be widely recognized
-- words that can link through different parts of speech
-- slightly less obvious compounds or cultural pairings
-
-Examples:
-
-- `dirt` -> `gossip`
-- `tea` -> `gossip`
-- `shade` -> `insult`
-- `cold` -> `illness`
-- `under` -> `weather` (from "under the weather", position the word 'under' underneath 'weather' in the grid)
-- `watch` -> `guard` via noun/verb overlap
-- `pig` -> `lipstick` from "you can't put lipstick on a pig"
-- `oil` -> `door` from a familiar squeaky-door / oiling-the-door saying pattern
+- Up to 4 C-tier edges (instead of 2)
+- Minimum 4 A-tier edges (instead of 6)
+- May use common double meanings, figurative senses, idioms, and slang
+- Words can link through different parts of speech
 
 Hard puzzle constraints:
 
 - Prefer common alternate meanings, not dictionary archaeology.
-- Prefer sayings and idioms that are widely recognizable, not regional or private turns of phrase.
+- Prefer sayings and idioms that are widely recognizable, not regional.
 - A player should be able to say "that is fair" once the clue is shown.
 - Do not stack obscurity with ambiguity.
-- If a word has several meanings, the intended one should still be recoverable from the local neighborhood.
 - Hard should come from layered reasoning, not from vague words that fit everywhere.
 
-## Puzzle Composition Rules
+---
 
-When generating a candidate puzzle:
+## Anti-Patterns: Examples of Slop
 
-1. Start from a seed set of 9 concrete, emoji-friendly words.
-2. Ensure every word participates in at least 2 strong links.
-3. Ensure the whole 3x3 grid covers all 12 adjacencies with valid clues.
-4. Mix relation types so the board is varied, but do not make the logic feel random.
-5. Prefer everyday vocabulary over obscure terms.
-6. Avoid duplicate words, near-duplicates, or trivial inflections unless they are the point.
-7. Avoid a board where too many edges are just “both are in the same general topic.”
-8. Avoid clues that are riddles. Clues are post-solve explanations.
+These are real examples of bad edges. Learn to recognize the patterns.
 
-## Review For Ambiguity
+| Words | Why it's junk |
+|-------|---------------|
+| `storm` + `night` | Loose thematic. Storms happen at any time. |
+| `board` + `case` | "Both can be containers"? Barely. Two-hop reasoning. |
+| `press` + `suit` | Only works via the niche phrase "press a suit." Most people won't get it. |
+| `man` + `power` | Too generic. Man + anything forms a compound. |
+| `fire` + `dance` | "Fire dance" exists but is not a common compound. |
+| `line` + `life` | "Lifeline" is a compound, but the clue leans on grid position rather than the word pair itself. |
+| `board` + `game` vs `board` + `room` vs `board` + `meeting` | `board` connecting three ways on one grid = generic connector. Pick one. |
+| `tea` + `tree` via "tea tree oil" | Requires a third word (`oil`) to make the phrase — violates the no-third-word rule. |
 
-After generating a candidate puzzle, review not only the intended 12 links but also the unintended links players might plausibly see.
-
-Reject or revise a board if:
-
-- one word can plausibly connect to too many other words in the set
-- a very generic adjective, noun, or verb acts like a universal connector
-- multiple unintended compounds are as strong as the intended ones
-- a word has several senses and the board does not sufficiently narrow which sense matters
-- two or more alternate full solutions seem plausible
-
-Words that often need extra scrutiny:
-
-- broad modifiers like `big`, `small`, `good`, `bad`, `high`, `low`
-- general-purpose nouns like `thing`, `place`, `man`, `people`, `time`
-- compound-friendly words like `house`, `line`, `water`, `fire`, `light`, `ball`
-
-Example failure mode:
-
-- `big` can pair naturally with many nouns in the same set, so even if one edge is intended, the word creates too many believable alternatives.
-
-Ambiguity review process:
-
-1. For each word, list every other word in the set it could plausibly link with.
-2. Flag any word that has too many plausible partners compared with the rest of the board.
-3. Check whether any unintended link is as strong as an intended link.
-4. Check whether swapping two or three words could still create a convincing alternate network.
-5. Replace or narrow overly flexible words until the intended structure is more specific.
+---
 
 ## Emoji Rules
 
-LexLink displays an emoji for each word. Generate one emoji per word with these rules:
+One emoji per word. Rules:
 
-- Prefer a direct, obvious emoji for the intended sense of the word.
-- For abstract or generic senses like colors, shapes, directions, numbers, or simple qualities, prefer a neutral symbol for the concept itself rather than a concrete example of it.
-- Keep emojis distinct within the same board where possible.
+- Prefer a direct, obvious emoji for the intended sense.
+- For abstract concepts (colors, directions, numbers), prefer neutral symbols: `Green` → `🟩`, not `🌿`.
+- Keep emojis distinct within the same board.
 - If a word has multiple senses, choose the emoji that supports the intended clue network.
-- Prefer concrete nouns and concepts that have recognizable emoji support.
-- If no single emoji exists, you may use a two-emoji combination for compound or complex concepts.
-- Keep two-emoji combinations literal and easy to parse, not cryptic.
-- Do not use more than two emojis for one word unless the user explicitly asks for looser emoji interpretation.
-- If no good single emoji or two-emoji combination exists, use the clearest approximate symbol rather than something clever but confusing.
-- Avoid smuggling in extra meaning through the emoji. Example: `Green` should usually be `🟩`, not `🌿`, unless the intended sense is specifically plant-like or leafy.
+- Two-emoji combinations are allowed for compound concepts: `Seahorse` → `🌊🐴`.
+- Do not use more than two emojis per word.
+- Do not smuggle extra meaning through the emoji.
 
-Examples:
+---
 
-- `Tea` -> `🍵`
-- `Green` -> `🟩`
-- `King` -> `🤴`
-- `Watch` -> `⌚`
-- `Plant` -> `🪴`
-- `Storm` -> `⛈️`
-- `Seahorse` -> `🌊🐴`
+## Workflow: Subagent Generate-Review Loop
 
-## Workflow
+When the user asks for puzzles, use a **generate → review → fix** loop with subagents. This produces better puzzles than single-pass generation.
 
-When the user asks for a new puzzle, follow this process:
+Use the `runSubagent` tool for each step. Run generators in parallel when producing multiple puzzles; run the reviewer as a separate subagent call so it starts with no memory of the generator's reasoning — this is the key to harsh, independent review.
 
-1. Propose a short concept or seed cluster.
-2. List the intended relation type for each edge candidate.
-3. Reject weak edges before locking the grid.
-4. Arrange the 9 words into a 3x3 so each of the 12 adjacencies is valid.
-5. Write short, natural-language clues for all 12 edges.
-6. Assign emojis to all 9 words.
-7. Review the board for unintended or overly flexible links.
-8. Replace overly broad words if they create too many plausible alternatives.
-9. Check whether the puzzle feels fair, varied, and non-redundant.
-10. If asked to add it to the app, format it for `src/lib/puzzles.ts`.
+### Pre-flight: Word-Set Viability Check
+
+BEFORE arranging any grid, list all 9 candidate words and enumerate every pairwise relation among them (36 possible pairs). The chosen 9 must support at least 12 strong edges drawn from A/B-tier relations, with no single word appearing in more than 4 plausible edges. If the word set can't support this, pick new words — do not proceed to grid placement.
+
+### Generating a single puzzle
+
+#### Step 1: Generate (Subagent)
+
+Launch a subagent via `runSubagent` with the prompt:
+
+> Generate a LexLink puzzle candidate. You are writing a 3x3 word-link grid with 9 words and 12 edges.
+>
+> GRID LAYOUT:
+> ```
+> 0 - 1 - 2
+> |   |   |
+> 3 - 4 - 5
+> |   |   |
+> 6 - 7 - 8
+> ```
+>
+> RULES:
+> 1. Pick 9 concrete, emoji-friendly English words.
+> 2. Before placing: list every pairwise relation among the 9 words. Verify at least 12 viable strong edges exist and no word is a generic connector (appears in 5+ plausible pairs).
+> 3. Arrange them in the 3x3 grid so every horizontal and vertical adjacency has a strong relationship.
+> 4. For EACH of the 12 edges, state:
+>    - The two words
+>    - The relation type (from: compound/phrase, object-role, part-whole, material/made-of, tool-action, cause-effect, cultural-pair, category-siblings, rhyme, homophone, anagram, opposite, sequence/state-change, containment, location/habitat, collective-noun, double-meaning, slang, symbol)
+>    - The tier (A, B, or C)
+>    - A one-sentence clue (the clue must work from just the two endpoint words — no reference to a third word)
+> 5. Minimum 6 A-tier edges, max 2 C-tier, at least 3 distinct relation types.
+> 6. At least 2 anchor edges must be Compound/Phrase or Cultural Pair type.
+> 7. Assign one emoji per word.
+>
+> {Insert any user-specified theme, difficulty, or constraints here.}
+>
+> Return the puzzle in this exact TypeScript format:
+> ```ts
+> {
+>   solution: [
+>     { word: 'Word', emoji: '🎯' },
+>     // ... 9 total
+>   ],
+>   edges: [
+>     { from: 0, to: 1, clue: 'Clue text.' },
+>     // ... 12 total
+>   ]
+> }
+> ```
+>
+> Also return a classification table:
+> | Edge | Words | Type | Tier | Clue |
+> |------|-------|------|------|------|
+> | 0→1  | X + Y | compound | A | ... |
+> | ...  | ...   | ...  | ... | ... |
+
+#### Step 2: Review (Subagent)
+
+Launch a SEPARATE subagent with the generated puzzle and this prompt:
+
+> You are a puzzle quality reviewer. Your job is to find weak edges and reject junk. Be harsh. Be specific. Do not approve slop.
+>
+> Review this LexLink puzzle candidate:
+> {paste the puzzle + classification table from Step 1}
+>
+> For EACH of the 12 edges, answer:
+> 1. Is the stated relation type correct? If not, what is it really?
+> 2. Does it pass the hard reject rules? Check each:
+>    - Can it be classified cleanly into one type?
+>    - Can the link be explained in one sentence?
+>    - Does the clue avoid hedging language?
+>    - Is it direct (no multi-hop)?
+>    - Would 80%+ of English speakers get it?
+>    - Is either word too generic for this board?
+>    - Reverse test: could someone distinguish this pair from a random pairing?
+>    - Does the clue work without depending on a third word?
+> 3. Rate the edge: PASS, WEAK (fixable), or REJECT (must replace).
+>
+> Then check board-level gates:
+> - At least 3 distinct relation types?
+> - No type on more than 6/12 edges?
+> - At least 6 A-tier edges?
+> - No more than 2 C-tier?
+> - Every word in at least 1 A-tier edge?
+> - Any word a generic connector (links to 5+ others plausibly)?
+> - Any plausible alternate solution from swapping 2-3 words?
+> - At least 2 obvious anchor edges?
+>
+> Return:
+> - A verdict for each edge (PASS / WEAK / REJECT)
+> - A list of specific fixes needed
+> - An overall verdict: ACCEPT, REVISE (fixable), or REJECT (start over)
+
+#### Step 3: Fix or Regenerate
+
+Based on the review:
+
+- **ACCEPT**: Use the puzzle as-is.
+- **REVISE**: Fix the specific edges flagged as WEAK or REJECT. You can do this yourself or launch another subagent to regenerate just the problem areas. Then send back through Step 2.
+- **REJECT**: Go back to Step 1 with adjusted constraints.
+
+**Maximum 3 loops.** If a puzzle hasn't converged after 3 generate-review cycles, discard it and start fresh with a different word seed.
+
+### Generating multiple puzzles
+
+When asked for N puzzles, launch N generator subagents in parallel (Step 1). Then review each result (Step 2 — can also be parallelized). Fix individually. This is much faster than sequential generation.
+
+### Generating hard puzzles
+
+Use the same loop, but adjust the generator prompt constraints:
+
+> Hard puzzle: minimum 4 A-tier edges (instead of 6), up to 4 C-tier edges (instead of 2). Prefer double meanings, idioms, figurative senses, and less obvious compounds. Every edge must still feel fair after reveal.
+
+---
 
 ## Output Format
 
-When returning a puzzle candidate for this repo, prefer this shape:
+When returning a puzzle candidate for this repo, use this shape (match the repo's tab indentation):
 
 ```ts
 {
 	solution: [
-		{ word: 'Tea', emoji: '🍵' },
-		{ word: 'Party', emoji: '🎉' },
-		{ word: 'Floor', emoji: '🪩' },
-		{ word: 'Tree', emoji: '🌳' },
-		{ word: 'Line', emoji: '➖' },
-		{ word: 'Dance', emoji: '💃' },
-		{ word: 'Top', emoji: '🔝' },
-		{ word: 'Up', emoji: '⬆️' },
-		{ word: 'Step', emoji: '👣' }
+		{ word: 'King', emoji: '🤴' },
+		{ word: 'Crown', emoji: '👑' },
+		{ word: 'Tooth', emoji: '🦷' },
+		{ word: 'Fairy', emoji: '🧚' },
+		{ word: 'Tale', emoji: '📖' },
+		{ word: 'Tail', emoji: '🐒' },
+		{ word: 'Coat', emoji: '🧥' },
+		{ word: 'Pocket', emoji: '👖' },
+		{ word: 'Watch', emoji: '⌚' }
 	],
 	edges: [
-		{ from: 0, to: 1, clue: 'A tea party can be genteel or chaotic.' },
-		{ from: 1, to: 2, clue: 'The party floor is where the crowd collects.' },
-		{ from: 3, to: 4, clue: 'A tree line marks the last timber standing.' },
-		{ from: 4, to: 5, clue: 'A line dance keeps everyone facing the same way.' },
-		{ from: 6, to: 7, clue: 'Top up the balance and carry on.' },
-		{ from: 7, to: 8, clue: 'Step up when it matters.' },
-		{ from: 0, to: 3, clue: 'Tea tree oil is the scented answer.' },
-		{ from: 3, to: 6, clue: 'A treetop is where the wind gets first say.' },
-		{ from: 1, to: 4, clue: 'A party line can be a script or a wire.' },
-		{ from: 4, to: 7, clue: 'Line up and wait your turn.' },
-		{ from: 2, to: 5, clue: 'A dance floor fills before the song finishes.' },
-		{ from: 5, to: 8, clue: 'A dance step is learned one beat at a time.' }
+		{ from: 0, to: 1, clue: 'Kings wear crowns.' },
+		{ from: 1, to: 2, clue: 'A crown can cap a damaged tooth.' },
+		{ from: 3, to: 4, clue: 'Fairies belong in fairy tales.' },
+		{ from: 4, to: 5, clue: 'Tale and tail sound identical.' },
+		{ from: 6, to: 7, clue: 'Coats come with pockets.' },
+		{ from: 7, to: 8, clue: 'A pocket watch is a classic pairing.' },
+		{ from: 0, to: 3, clue: 'The tooth fairy answers to both.' },
+		{ from: 3, to: 6, clue: 'A fairy-tale coat belongs in the wardrobe.' },
+		{ from: 1, to: 4, clue: 'Crowns feature in plenty of tales.' },
+		{ from: 4, to: 7, clue: 'Tales have pockets of detail.' },
+		{ from: 2, to: 5, clue: 'Both can describe an end.' },
+		{ from: 5, to: 8, clue: 'A watchful animal keeps an eye on its tail.' }
 	]
 }
 ```
+
+Example classification table for that puzzle:
+
+| Edge | Words | Type | Tier |
+|------|-------|------|------|
+| 0→1 | King + Crown | object-role | A |
+| 1→2 | Crown + Tooth | object-role | A |
+| 3→4 | Fairy + Tale | compound/phrase | A |
+| 4→5 | Tale + Tail | homophone | B |
+| 6→7 | Coat + Pocket | part-whole | A |
+| 7→8 | Pocket + Watch | compound/phrase | A |
+| 0→3 | King + Fairy | cultural-pair | B |
+| 3→6 | Fairy + Coat | object-role | B |
+| 1→4 | Crown + Tale | object-role | B |
+| 4→7 | Tale + Pocket | double-meaning | C |
+| 2→5 | Tooth + Tail | category-siblings | B |
+| 5→8 | Tail + Watch | object-role | A |
+
+Count: 6 A-tier, 5 B-tier, 1 C-tier. 6 distinct relation types. Passes gates.
+
+---
 
 ## Review Checklist
 
 Before presenting or committing a puzzle, verify:
 
-- All 12 edges are present.
-- Every clue matches the exact words in its two endpoints.
-- No clue accidentally depends on a third word elsewhere in the board.
-- The board uses at least 2 relation families.
-- The board has a few easy anchors and a few satisfying reveals.
-- Hard puzzles use trickier relations without becoming obscure or vague.
-- No word behaves like a catch-all connector with too many plausible partners.
-- No alternate arrangement creates a similarly convincing link network.
-- Each word has a suitable emoji.
-- The final result feels like a LexLink puzzle, not a random word web.
+- [ ] All 12 edges are present.
+- [ ] Every edge has been classified with a relation type.
+- [ ] No edge was classified as REJECT by the reviewer.
+- [ ] Every clue matches the exact words in its two endpoints.
+- [ ] No clue depends on a third word from the board.
+- [ ] The board uses at least 3 relation families.
+- [ ] At least 6 A-tier edges (4 for hard).
+- [ ] No more than 2 C-tier edges (4 for hard).
+- [ ] The board has 2+ obvious anchor edges.
+- [ ] No word is a catch-all connector with too many plausible partners.
+- [ ] No plausible alternate arrangement.
+- [ ] Each word has a suitable emoji.
+- [ ] Hard puzzles feel fair after reveal, not obscure.
+- [ ] The final result feels like a LexLink puzzle, not a random word web.
+
+---
 
 ## If Editing The Repo
 
