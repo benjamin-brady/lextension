@@ -38,7 +38,12 @@ COMPOUND DIRECTION CHECK (do this FIRST before anything else):
 - Is "{a} {b}" (or "{a}{b}" as one word) a recognized English compound? If yes, type=compound is allowed.
 - If neither "{a} {b}" nor "{a}{b}" is recognized, type=compound is FORBIDDEN — even if "{b} {a}" would work. Check other types instead.
 
+RHYME CHECK (do this SECOND — spelling does NOT matter, only sound):
+- Say both words aloud. Do the ending sounds match? tail/male ✓ (both -ale sound), hail/pale ✓, rain/cane ✓, bone/phone ✓, night/kite ✓, gold/bold ✓. Different spellings are fine — rhyme is about SOUND not spelling.
+
+Then check ALL remaining types (synonym, opposite, category-sibling, part-whole, object-role, material, verb-object, collocation, cause-effect, cultural-pair, slang, double-meaning, homophone, containment, anagram).
+
 Reply with ONLY this JSON (no markdown, no extra text):
-{"compound_concat":"{a} {b}","compound_is_word":true_or_false,"valid":true,"type":"compound","reason":"one sentence"}
+{"compound_concat":"{a} {b}","compound_is_word":true_or_false,"valid":true,"type":"<type>","reason":"one sentence"}
 or
 {"compound_concat":"{a} {b}","compound_is_word":false,"valid":false,"type":null,"reason":"one sentence"}`;
