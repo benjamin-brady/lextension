@@ -4,7 +4,7 @@ RELATIONSHIP TYPES (accept if ANY of these apply — check EVERY type before rej
 
 1. compound: ORDER TEST — is "A B" (in that order) a recognized compound? This includes BOTH closed compounds (one word: "hotdog", "sunburn") AND open compounds (two words: "ice cream", "apple pie", "boxing match", "apple computer", "satellite phone"). The test: would most English speakers recognize "A B" as a fixed noun phrase or compound? If YES → accept. If the phrase only works as "B A" and not "A B", REJECT as compound. Examples: A="hot" B="dog" → "hot dog" ✓. A="dog" B="hot" → "dog hot" ✗. A="apple" B="pie" → "apple pie" ✓. A="satellite" B="phone" → "satellite phone" ✓.
 2. synonym: same/similar meaning → cab/taxi, big/large
-3. rhyme: clear rhyme → cat/hat, moon/spoon
+3. rhyme: ending sounds match (spelling can differ) → cat/hat, moon/spoon, tail/male, hail/pale, rain/cane, bone/phone, night/kite, gold/bold, time/rhyme
 4. opposite: antonyms → hot/cold, up/down
 5. category-sibling: same named category → piano/guitar (instruments), apple/pear (fruits)
 6. part-whole: A is a NAMED, CANONICAL part of B (or vice versa) → wheel/car, petal/flower, wing/bird, trunk/elephant. The part must be a specific, recognized component — not a generic size word. "chunk", "piece", "bit", "section", "fragment", "slab", "portion" are NOT valid parts of anything because you can say "a chunk of" literally anything physical. If the relationship is just "X can be broken into pieces called Y", REJECT.
