@@ -7,6 +7,8 @@ routes = [
   { pattern = "lextension.net", custom_domain = true },
 ]
 
+workers_dev = true
+
 [vars]
 PUBLIC_GA_MEASUREMENT_ID = ""
 
