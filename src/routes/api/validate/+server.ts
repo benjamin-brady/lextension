@@ -13,14 +13,14 @@ function cacheKey(a: string, b: string): string {
 async function validatePairWithLLM(a: string, b: string, apiKey: string): Promise<LinkVerdict> {
   const prompt = VALIDATION_PROMPT.replace('{a}', a).replace('{b}', b);
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'openai/gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
       max_tokens: 200,
