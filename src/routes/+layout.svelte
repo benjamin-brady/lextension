@@ -2,8 +2,10 @@
 	import { afterNavigate } from '$app/navigation';
 	import { env } from '$env/dynamic/public';
 	import HowToPlay from '$lib/components/HowToPlay.svelte';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { getTodaysPuzzleInfo } from '$lib/puzzles';
+	import { theme, resolveTheme } from '$lib/theme.svelte';
 	import { trackPageView } from '../lib/analytics';
 	import '../app.css';
 
@@ -27,6 +29,21 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 
 		trackPageView(new URL(window.location.href), gaMeasurementId);
 	});
+
+	$effect(() => {
+		if (typeof document === 'undefined') return;
+		const choice = theme.choice;
+		const apply = () => {
+			const resolved = resolveTheme(choice);
+			document.documentElement.classList.toggle('dark', resolved === 'dark');
+			document.documentElement.dataset.theme = choice;
+		};
+		apply();
+		if (choice !== 'system') return;
+		const mq = window.matchMedia('(prefers-color-scheme: dark)');
+		mq.addEventListener('change', apply);
+		return () => mq.removeEventListener('change', apply);
+	});
 </script>
 
 <svelte:head>
@@ -45,7 +62,10 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 				</span>
 				<span class="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-(--text-muted)">№{puzzleNumber}</span>
 			</a>
-			<HowToPlay />
+			<div class="flex items-center gap-2">
+				<ThemeToggle />
+				<HowToPlay />
+			</div>
 		</div>
 		<nav class="flex items-center justify-center gap-4 pb-2 text-[11px] font-bold uppercase tracking-[0.22em]">
 			<a class="px-2 py-1 border-b-2 border-transparent text-(--text) transition-colors hover:border-(--accent)" href="/">Daily</a>

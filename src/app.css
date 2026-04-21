@@ -77,12 +77,33 @@ body::before {
 	mix-blend-mode: multiply;
 }
 
+:global(.dark) body::before {
+	opacity: 0.35;
+	mix-blend-mode: screen;
+}
+
 .font-display {
 	font-family: var(--font-display);
 	font-feature-settings: 'ss01';
 }
 
 .dark {
+	--bg: #14141c;
+	--bg-raised: #1c1c28;
+	--surface: #23232f;
+	--surface-light: #2c2c3a;
+	--border: rgba(240, 235, 220, 0.18);
+	--border-strong: rgba(240, 235, 220, 0.5);
+	--ink: #f3ede1;
+	--text: #f3ede1;
+	--text-muted: #a8a2b3;
+	--accent: #ff6a6c;
+	--accent-ink: #ff8d8f;
+	--accent-soft: rgba(255, 106, 108, 0.18);
+	--green: #4fbf63;
+	--yellow: #f4c15c;
+	--red: #ff6a6c;
+	color-scheme: dark;
 	--background: oklch(0.145 0 0);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);

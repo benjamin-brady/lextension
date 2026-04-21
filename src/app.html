@@ -5,6 +5,22 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 		<title>LexLink - Word Connection Puzzle</title>
 		<meta name="description" content="LexLink is a daily word puzzle where you arrange words in a grid so that connected words share a hidden relationship." />
+		<script>
+			(function () {
+				try {
+					var raw = localStorage.getItem('site_theme');
+					var choice = raw ? JSON.parse(raw) : 'system';
+					var resolved =
+						choice === 'system'
+							? window.matchMedia('(prefers-color-scheme: dark)').matches
+								? 'dark'
+								: 'light'
+							: choice;
+					if (resolved === 'dark') document.documentElement.classList.add('dark');
+					document.documentElement.dataset.theme = choice;
+				} catch (e) {}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
