@@ -33,3 +33,13 @@ export function randomPair(): [string, string] {
   if (b >= a) b++;
   return [WORD_BANK[a], WORD_BANK[b]];
 }
+
+/** Pick three distinct random words (seeds + target) for Fibonacci mode. */
+export function randomTriple(): [string, string, string] {
+  const indices = new Set<number>();
+  while (indices.size < 3) {
+    indices.add(Math.floor(Math.random() * WORD_BANK.length));
+  }
+  const [a, b, c] = [...indices];
+  return [WORD_BANK[a], WORD_BANK[b], WORD_BANK[c]];
+}
