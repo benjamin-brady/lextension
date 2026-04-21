@@ -2,8 +2,18 @@
   import { createInitialState, validateLink, getScore, type GameState } from '$lib/game';
   import type { LinkVerdict } from '$lib/types';
   import { trackGuessHit, trackGuessMiss, trackGameComplete, trackShare, trackReset } from '$lib/analytics';
+  import { chainEmojiSummary } from '$lib/share';
+  import { recordCompletion, type DailyMode } from '$lib/streak';
 
-  let { start, end }: { start: string; end: string } = $props();
+  let {
+    start,
+    end,
+    daily,
+  }: {
+    start: string;
+    end: string;
+    daily?: { date: string; mode: DailyMode };
+  } = $props();
 
   let game: GameState = $state(createInitialState(start, end));
   let inputValue = $state('');
@@ -45,6 +55,7 @@
           game.isComplete = true;
           const si = getScore(game.chain);
           if (si) trackGameComplete('chain', si.hops, si.score, si.rating);
+          if (daily) recordCompletion(daily.mode, daily.date);
         }
       } else {
         game.error = `No valid link: ${lastWord} → ${word}. ${verdict.reason}`;
@@ -73,6 +84,7 @@
         trackGuessHit(lastWord, end, verdict.type, 'chain');
         const si = getScore(game.chain);
         if (si) trackGameComplete('chain', si.hops, si.score, si.rating);
+        if (daily) recordCompletion(daily.mode, daily.date);
       } else {
         game.error = `No valid link: ${lastWord} → ${end}. ${verdict.reason}`;
         trackGuessMiss(lastWord, end, verdict.reason, 'chain');
@@ -123,7 +135,10 @@
 
   function shareResult() {
     if (!scoreInfo) return;
-    const text = `🔗 Lextension: ${start} → ${end}\n${scoreInfo.hops} hops • ${scoreInfo.score} pts • ${scoreInfo.rating}\n${game.chain.join(' → ')}`;
+    const url = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : '';
+    const emoji = chainEmojiSummary(game.chain);
+    const header = daily ? `🔗 Lextension Daily ${daily.date}` : `🔗 Lextension: ${start} → ${end}`;
+    const text = `${header}\n${emoji}\n${scoreInfo.hops} hops • ${scoreInfo.rating}${url ? `\n${url}` : ''}`;
     navigator.clipboard?.writeText(text);
     trackShare('chain');
   }

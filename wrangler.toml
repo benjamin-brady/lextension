@@ -19,3 +19,14 @@ binding = "ASSETS"
 [[kv_namespaces]]
 binding = "LINK_CACHE"
 id = "84e6a49904a64b1d8fd5f5793f3f0971"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lextension-daily"
+database_id = "ef682bae-1f81-4647-8116-9258cdd452e1"
+migrations_dir = "drizzle"
+
+# Daily prefill: each /daily request ensures today + next 2 days exist in D1.
+# Cron-style scheduling is intentionally omitted — the SvelteKit Cloudflare
+# adapter doesn't expose `scheduled()`. Point any external cron at
+# `POST /api/cron/prefill?secret=...` if you want belt-and-braces prefill.

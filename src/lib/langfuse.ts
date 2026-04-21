@@ -86,3 +86,64 @@ export async function traceLLMValidation(
 		// best-effort
 	}
 }
+
+/**
+ * Record a negative user-feedback score in Langfuse for a word-pair validation.
+ * Creates a trace + score event. Fire-and-forget — never throws.
+ */
+export async function scoreValidationFeedback(
+	env: Env,
+	opts: {
+		wordA: string;
+		wordB: string;
+		comment: string;
+		value: number; // -1 = thumbs down, +1 = thumbs up
+	},
+): Promise<void> {
+	const auth = langfuseAuth(env);
+	if (!auth) return;
+
+	const traceId = crypto.randomUUID();
+	const now = new Date().toISOString();
+
+	try {
+		await fetch(`${LANGFUSE_HOST}/api/public/ingestion`, {
+			method: 'POST',
+			headers: { Authorization: auth, 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				batch: [
+					{
+						id: crypto.randomUUID(),
+						type: 'trace-create',
+						timestamp: now,
+						body: {
+							id: traceId,
+							name: 'user-feedback',
+							input: `${opts.wordA} → ${opts.wordB}`,
+							metadata: {
+								wordA: opts.wordA,
+								wordB: opts.wordB,
+								comment: opts.comment,
+								value: opts.value,
+							},
+							tags: ['lextension', 'feedback'],
+						},
+					},
+					{
+						id: crypto.randomUUID(),
+						type: 'score-create',
+						timestamp: now,
+						body: {
+							traceId,
+							name: 'user-feedback',
+							value: opts.value,
+							comment: opts.comment || `${opts.wordA} → ${opts.wordB}`,
+						},
+					},
+				],
+			}),
+		});
+	} catch {
+		// best-effort
+	}
+}

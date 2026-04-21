@@ -12,9 +12,11 @@ declare global {
 		interface Platform {
 			env: {
 				LINK_CACHE: KVNamespace;
+				DB: D1Database;
 				OPENROUTER_API_KEY?: string;
 				LANGFUSE_PUBLIC_KEY?: string;
 				LANGFUSE_SECRET_KEY?: string;
+				CRON_SECRET?: string;
 			};
 			cf?: {
 				country?: string;

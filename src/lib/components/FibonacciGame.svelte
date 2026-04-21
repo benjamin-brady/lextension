@@ -2,8 +2,20 @@
   import { validateLink, type GameState } from '$lib/game';
   import type { LinkVerdict } from '$lib/types';
   import { trackGuessHit, trackGuessMiss, trackGameComplete, trackShare, trackReset } from '$lib/analytics';
+  import { fibEmojiSummary } from '$lib/share';
+  import { recordCompletion, type DailyMode } from '$lib/streak';
 
-  let { startA, startB, target }: { startA: string; startB: string; target: string } = $props();
+  let {
+    startA,
+    startB,
+    target,
+    daily,
+  }: {
+    startA: string;
+    startB: string;
+    target: string;
+    daily?: { date: string; mode: DailyMode };
+  } = $props();
 
   interface FibState {
     chain: string[];
@@ -67,6 +79,7 @@
           game.isComplete = true;
           const si = getScoreInfo();
           if (si) trackGameComplete('fibonacci', si.steps, si.score, si.rating);
+          if (daily) recordCompletion(daily.mode, daily.date);
         }
       } else if (!v1.valid && !v2.valid) {
         game.error = `No link to either word.\n${prev2} → ${word}: ${v1.reason}\n${prev1} → ${word}: ${v2.reason}`;
@@ -105,6 +118,7 @@
         trackGuessHit(prev1, target, v2.type, 'fibonacci');
         const si = getScoreInfo();
         if (si) trackGameComplete('fibonacci', si.steps, si.score, si.rating);
+        if (daily) recordCompletion(daily.mode, daily.date);
       } else if (!v1.valid && !v2.valid) {
         game.error = `No link to either word.\n${prev2} → ${target}: ${v1.reason}\n${prev1} → ${target}: ${v2.reason}`;
         trackGuessMiss(prev1, target, 'no link to either', 'fibonacci');
@@ -164,7 +178,10 @@
 
   function shareResult() {
     if (!scoreInfo) return;
-    const text = `🌀 Lextension Fibonacci: ${startA}, ${startB} → ${target}\n${scoreInfo.steps} steps • ${scoreInfo.score} pts • ${scoreInfo.rating}\n${game.chain.join(' → ')}`;
+    const url = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : '';
+    const emoji = fibEmojiSummary(game.chain);
+    const header = daily ? `🌀 Lextension Fib Daily ${daily.date}` : `🌀 Lextension Fibonacci: ${startA}, ${startB} → ${target}`;
+    const text = `${header}\n${emoji}\n${scoreInfo.steps} steps • ${scoreInfo.rating}${url ? `\n${url}` : ''}`;
     navigator.clipboard?.writeText(text);
     trackShare('fibonacci');
   }
