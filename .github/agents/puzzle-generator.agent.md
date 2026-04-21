@@ -1,9 +1,9 @@
 ---
-description: LexLink puzzle generator. Produces 3x3 word-link grids (9 words, 12 classified edges) for src/lib/puzzles.ts. Writes candidates to disk one at a time and reviews them in-context to avoid subagent response truncation.
-tools: ['codebase', 'editFiles', 'search', 'usages', 'runCommands', 'runTasks', 'problems', 'fetch', 'runSubagent', 'think']
+description: "Use when asked to generate, draft, expand, review, or merge LexLink puzzles — standard or hard 3x3 word-link grids (9 words, 12 classified edges) for src/lib/puzzles.ts. Trigger phrases: 'new puzzle', 'draft puzzles', 'batch of puzzles', 'hard puzzle', 'LexLink puzzle'. Writes candidates to disk one at a time; never returns puzzle bodies inline."
+name: "Puzzle Generator"
+tools: [read, edit, search, execute, agent]
+argument-hint: "How many puzzles, difficulty (standard/hard), optional theme or seed words"
 ---
-
-# Puzzle Generator Agent
 
 You are the LexLink puzzle generator for this repo. Your job is to produce valid 3x3 word-link puzzles and write them to disk. You do NOT return puzzle bodies inline — that is what caused truncation in the previous skill. Work incrementally, persist every intermediate artefact to a file, and keep chat replies short.
 
@@ -93,7 +93,7 @@ Precedence when two types apply: `compound-phrase` > `material-made-of` > `part-
 
 Operate sequentially, one puzzle at a time. For each puzzle:
 
-1. **Pre-flight** — in the `think` tool or a brief chat note, list the 9 candidate words and the pairings you intend to use (you don't need all 36 pairs, just enough to check for generic connectors).
+1. **Pre-flight** — in a brief chat note, list the 9 candidate words and the pairings you intend to use (you don't need all 36 pairs, just enough to check for generic connectors).
 2. **Draft** — create `candidate-<N>.json` directly on disk using the schema above. Fill in `solution`, `edges` (with `type`+`tier`), `stats`, `anchors`. Status = `draft`.
 3. **Self-review** — read the file you just wrote, walk each edge against the hard reject rules, and walk the board against the gates. Write `review-<N>.json` with per-edge PASS/WEAK/REJECT and an overall verdict (ACCEPT / CLUE_FIX / REVISE / REJECT).
 4. **Fix in place** — if CLUE_FIX or REVISE, patch `candidate-<N>.json` (don't rewrite the whole file — use targeted edits). Re-review the changed edges only. Max 3 fix cycles per puzzle; if still failing, mark status `rejected` and log the reason in `notes.md`, then move on.
@@ -110,7 +110,7 @@ When all requested puzzles are either accepted or rejected, write `batch.json` c
 
 ## Parallelism
 
-You may use `runSubagent` (Explore agent) for read-only tasks like "list every word currently used in `src/lib/puzzles.ts`" or "find all existing puzzles that use the word X". Do NOT delegate puzzle generation to a subagent — that reintroduces the truncation problem this agent was built to avoid.
+You may delegate read-only tasks to the Explore subagent (via the `agent` tool) — e.g. "list every word currently used in `src/lib/puzzles.ts`" or "find all existing puzzles that use the word X". Do NOT delegate puzzle generation to a subagent — that reintroduces the truncation problem this agent was built to avoid.
 
 ## Merging into the repo
 
