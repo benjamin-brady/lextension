@@ -1,10 +1,27 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
+	import { env } from '$env/dynamic/public';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { theme, resolveTheme } from '$lib/theme.svelte';
+	import { trackPageView } from '$lib/analytics';
 	import '../app.css';
 
 	let { children } = $props();
+
+	const gaMeasurementId = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
+	const gaBootstrapScript = gaMeasurementId
+		? `window.dataLayer = window.dataLayer || [];
+function gtag(){window.dataLayer.push(arguments);}
+window.gtag = gtag;
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
+		: '';
+
+	afterNavigate(() => {
+		if (!gaMeasurementId || typeof window === 'undefined') return;
+		trackPageView(new URL(window.location.href), gaMeasurementId);
+	});
 
 	$effect(() => {
 		if (typeof document === 'undefined') return;
@@ -23,6 +40,10 @@
 </script>
 
 <svelte:head>
+	{#if gaMeasurementId}
+		<script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
+		{@html `<script>${gaBootstrapScript}<\/script>`}
+	{/if}
 	<title>Lextension - Word Bridge Puzzle</title>
 	<meta name="description" content="Bridge between two words using word relationships. Fewer hops = higher score!" />
 </svelte:head>

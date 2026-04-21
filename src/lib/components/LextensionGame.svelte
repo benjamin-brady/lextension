@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createInitialState, validateLink, getScore, type GameState } from '$lib/game';
   import type { LinkVerdict } from '$lib/types';
+  import { trackGuessHit, trackGuessMiss, trackGameComplete, trackShare, trackReset } from '$lib/analytics';
 
   let { start, end }: { start: string; end: string } = $props();
 
@@ -14,6 +15,7 @@
   function resetGame() {
     game = createInitialState(start, end);
     inputValue = '';
+    trackReset('chain');
   }
 
   async function addWord() {
@@ -35,14 +37,18 @@
         game.chain = [...game.chain, word];
         game.verdicts = [...game.verdicts, verdict];
         inputValue = '';
+        trackGuessHit(lastWord, word, verdict.type, 'chain');
 
         // Check if we can connect to the end word
         // (don't auto-check, let the player explicitly bridge to end)
         if (word.toLowerCase() === end.toLowerCase()) {
           game.isComplete = true;
+          const si = getScore(game.chain);
+          if (si) trackGameComplete('chain', si.hops, si.score, si.rating);
         }
       } else {
         game.error = `No valid link: ${lastWord} → ${word}. ${verdict.reason}`;
+        trackGuessMiss(lastWord, word, verdict.reason, 'chain');
       }
     } catch (err) {
       game.error = err instanceof Error ? err.message : 'Validation failed';
@@ -64,8 +70,12 @@
         game.chain = [...game.chain, end];
         game.verdicts = [...game.verdicts, verdict];
         game.isComplete = true;
+        trackGuessHit(lastWord, end, verdict.type, 'chain');
+        const si = getScore(game.chain);
+        if (si) trackGameComplete('chain', si.hops, si.score, si.rating);
       } else {
         game.error = `No valid link: ${lastWord} → ${end}. ${verdict.reason}`;
+        trackGuessMiss(lastWord, end, verdict.reason, 'chain');
       }
     } catch (err) {
       game.error = err instanceof Error ? err.message : 'Validation failed';
@@ -115,6 +125,7 @@
     if (!scoreInfo) return;
     const text = `🔗 Lextension: ${start} → ${end}\n${scoreInfo.hops} hops • ${scoreInfo.score} pts • ${scoreInfo.rating}\n${game.chain.join(' → ')}`;
     navigator.clipboard?.writeText(text);
+    trackShare('chain');
   }
 </script>
 

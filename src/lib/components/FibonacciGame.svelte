@@ -1,6 +1,7 @@
 <script lang="ts">
   import { validateLink, type GameState } from '$lib/game';
   import type { LinkVerdict } from '$lib/types';
+  import { trackGuessHit, trackGuessMiss, trackGameComplete, trackShare, trackReset } from '$lib/analytics';
 
   let { startA, startB, target }: { startA: string; startB: string; target: string } = $props();
 
@@ -34,6 +35,7 @@
   function resetGame() {
     game = createState();
     inputValue = '';
+    trackReset('fibonacci');
   }
 
   async function addWord() {
@@ -59,16 +61,22 @@
         game.chain = [...game.chain, word];
         game.verdictPairs = [...game.verdictPairs, [v1, v2]];
         inputValue = '';
+        trackGuessHit(prev1, word, v2.type, 'fibonacci');
 
         if (word.toLowerCase() === target.toLowerCase()) {
           game.isComplete = true;
+          const si = getScoreInfo();
+          if (si) trackGameComplete('fibonacci', si.steps, si.score, si.rating);
         }
       } else if (!v1.valid && !v2.valid) {
         game.error = `No link to either word.\n${prev2} → ${word}: ${v1.reason}\n${prev1} → ${word}: ${v2.reason}`;
+        trackGuessMiss(prev1, word, 'no link to either', 'fibonacci');
       } else if (!v1.valid) {
         game.error = `Links to ${prev1} (${v2.type}) but not ${prev2}: ${v1.reason}`;
+        trackGuessMiss(prev2, word, v1.reason, 'fibonacci');
       } else {
         game.error = `Links to ${prev2} (${v1.type}) but not ${prev1}: ${v2.reason}`;
+        trackGuessMiss(prev1, word, v2.reason, 'fibonacci');
       }
     } catch (err) {
       game.error = err instanceof Error ? err.message : 'Validation failed';
@@ -94,12 +102,18 @@
         game.chain = [...game.chain, target];
         game.verdictPairs = [...game.verdictPairs, [v1, v2]];
         game.isComplete = true;
+        trackGuessHit(prev1, target, v2.type, 'fibonacci');
+        const si = getScoreInfo();
+        if (si) trackGameComplete('fibonacci', si.steps, si.score, si.rating);
       } else if (!v1.valid && !v2.valid) {
         game.error = `No link to either word.\n${prev2} → ${target}: ${v1.reason}\n${prev1} → ${target}: ${v2.reason}`;
+        trackGuessMiss(prev1, target, 'no link to either', 'fibonacci');
       } else if (!v1.valid) {
         game.error = `${target} links to ${prev1} but not ${prev2}: ${v1.reason}`;
+        trackGuessMiss(prev2, target, v1.reason, 'fibonacci');
       } else {
         game.error = `${target} links to ${prev2} but not ${prev1}: ${v2.reason}`;
+        trackGuessMiss(prev1, target, v2.reason, 'fibonacci');
       }
     } catch (err) {
       game.error = err instanceof Error ? err.message : 'Validation failed';
@@ -152,6 +166,7 @@
     if (!scoreInfo) return;
     const text = `🌀 Lextension Fibonacci: ${startA}, ${startB} → ${target}\n${scoreInfo.steps} steps • ${scoreInfo.score} pts • ${scoreInfo.rating}\n${game.chain.join(' → ')}`;
     navigator.clipboard?.writeText(text);
+    trackShare('fibonacci');
   }
 </script>
 

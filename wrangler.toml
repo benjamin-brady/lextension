@@ -10,7 +10,7 @@ routes = [
 workers_dev = true
 
 [vars]
-PUBLIC_GA_MEASUREMENT_ID = ""
+PUBLIC_GA_MEASUREMENT_ID = "G-FX1K0XBS6T"
 
 [assets]
 directory = ".svelte-kit/cloudflare"

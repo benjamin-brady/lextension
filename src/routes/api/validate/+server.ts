@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { VALIDATION_PROMPT } from '$lib/validation-prompt';
 import type { LinkVerdict } from '$lib/types';
+import { traceLLMValidation } from '$lib/langfuse';
 
 function cacheKey(a: string, b: string): string {
   // Order-dependent: compounds are directional (hot→dog ≠ dog→hot)
@@ -70,7 +71,9 @@ function parseLLMResponse(a: string, b: string, raw: string): LinkVerdict {
   return { a, b, valid, type, reason };
 }
 
-async function validatePairWithLLM(a: string, b: string, apiKey: string): Promise<LinkVerdict> {
+const MODEL = 'google/gemini-2.5-flash';
+
+async function validatePairWithLLM(a: string, b: string, apiKey: string): Promise<{ verdict: LinkVerdict; raw: string; prompt: string }> {
   const prompt = VALIDATION_PROMPT.replaceAll('{a}', a).replaceAll('{b}', b);
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -80,7 +83,7 @@ async function validatePairWithLLM(a: string, b: string, apiKey: string): Promis
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
+      model: MODEL,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
       max_tokens: 200,
@@ -97,7 +100,7 @@ async function validatePairWithLLM(a: string, b: string, apiKey: string): Promis
     choices: Array<{ message: { content: string } }>;
   };
   const raw = data.choices[0]?.message?.content ?? '';
-  return parseLLMResponse(a, b, raw);
+  return { verdict: parseLLMResponse(a, b, raw), raw, prompt };
 }
 
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -142,11 +145,30 @@ export const POST: RequestHandler = async ({ request, platform }) => {
   }
 
   // Call LLM
-  const verdict = await validatePairWithLLM(a, b, apiKey);
+  const t0 = Date.now();
+  const { verdict, raw, prompt } = await validatePairWithLLM(a, b, apiKey);
+  const durationMs = Date.now() - t0;
 
   // Cache the result (no expiry — word relationships don't change)
   if (kv) {
     await kv.put(key, JSON.stringify(verdict));
+  }
+
+  // Trace to Langfuse (fire-and-forget)
+  const env = platform?.env;
+  if (env) {
+    void traceLLMValidation(env, {
+      wordA: a,
+      wordB: b,
+      prompt,
+      rawResponse: raw,
+      valid: verdict.valid,
+      type: verdict.type,
+      reason: verdict.reason,
+      model: MODEL,
+      cached: false,
+      durationMs,
+    });
   }
 
   return json(verdict);
