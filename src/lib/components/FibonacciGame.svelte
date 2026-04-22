@@ -2,6 +2,7 @@
   import { validateLink, type GameState } from '$lib/game';
   import type { LinkVerdict } from '$lib/types';
   import { trackGuessHit, trackGuessMiss, trackGameComplete, trackShare, trackReset } from '$lib/analytics';
+  import CrossPromoCard from '$lib/components/CrossPromoCard.svelte';
   import { fibEmojiSummary } from '$lib/share';
   import { recordCompletion, type DailyMode } from '$lib/streak';
   import { saveFibGame, loadFibGame } from '$lib/game-persist';
@@ -427,6 +428,8 @@
         </button>
       </div>
     </div>
+
+    <CrossPromoCard />
   {/if}
 
   <!-- How it works -->

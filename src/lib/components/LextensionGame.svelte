@@ -5,6 +5,7 @@
   import { chainEmojiSummary } from '$lib/share';
   import { recordCompletion, type DailyMode } from '$lib/streak';
   import { saveChainGame, loadChainGame } from '$lib/game-persist';
+  import CrossPromoCard from '$lib/components/CrossPromoCard.svelte';
 
   let {
     start,
@@ -342,6 +343,8 @@
         </button>
       </div>
     </div>
+
+    <CrossPromoCard />
   {/if}
 
   <!-- How it works hint -->
