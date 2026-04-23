@@ -356,13 +356,14 @@
       <ul class="list-disc pl-4 space-y-0.5">
         <li>🧩 Compound words (ice → cream)</li>
         <li>🔄 Synonyms (cab → taxi)</li>
-        <li>🎵 Rhymes (cat → hat)</li>
+        <li>🎵 Rhymes: exact ending sounds, spelling variants, and some UK/US variants (cat → hat, tail → tale, litre → cheater)</li>
         <li>⚡ Opposites (hot → cold)</li>
         <li>🤝 Cultural pairs (salt → pepper)</li>
         <li>💪 Verb-object (chop → wood)</li>
         <li>🎯 Double meaning (bar → lawyer)</li>
         <li>...and more!</li>
       </ul>
+      <p>Rhymes are checked by pronunciation first. Near-rhymes and loose vowel matches do not count.</p>
       <p>Fewer hops = higher score. <strong>1 hop = Genius!</strong></p>
     </div>
   </details>

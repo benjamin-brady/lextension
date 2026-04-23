@@ -1,3 +1,4 @@
+import { dictionary } from 'cmu-pronouncing-dictionary';
 import type { LinkVerdict } from '$lib/types';
 
 export const RHYME_ENDING_GROUPS = [
@@ -12,22 +13,113 @@ export const RHYME_ENDING_GROUPS = [
 	['oon'],
 ] as const;
 
+const PRONUNCIATION_VARIANT_SUFFIX = /\(\d+\)$/;
+const STRESSED_VOWEL_PATTERN = /[12]$/;
+const UK_TO_US_SPELLING_RULES: ReadonlyArray<readonly [RegExp, string]> = [
+	[/isations$/g, 'izations'],
+	[/isation$/g, 'ization'],
+	[/isers$/g, 'izers'],
+	[/iser$/g, 'izer'],
+	[/ised$/g, 'ized'],
+	[/ises$/g, 'izes'],
+	[/ising$/g, 'izing'],
+	[/ise$/g, 'ize'],
+	[/ysers$/g, 'yzers'],
+	[/yser$/g, 'yzer'],
+	[/ysed$/g, 'yzed'],
+	[/yses$/g, 'yzes'],
+	[/ysing$/g, 'yzing'],
+	[/yse$/g, 'yze'],
+	[/ogues$/g, 'ogs'],
+	[/ogue$/g, 'og'],
+	[/ours$/g, 'ors'],
+	[/our$/g, 'or'],
+	[/res$/g, 'ers'],
+	[/re$/g, 'er'],
+];
+
+const PRONUNCIATIONS_BY_WORD = Object.entries(dictionary).reduce<Map<string, string[]>>((index, [rawWord, pronunciation]) => {
+	const word = rawWord.replace(PRONUNCIATION_VARIANT_SUFFIX, '');
+	const existing = index.get(word);
+
+	if (existing) {
+		existing.push(pronunciation);
+	} else {
+		index.set(word, [pronunciation]);
+	}
+
+	return index;
+}, new Map());
+
 function normalizeLetters(word: string): string {
 	return word.toLowerCase().replace(/[^a-z]/g, '');
 }
 
-export function areAnagrams(a: string, b: string): boolean {
-	const left = normalizeLetters(a);
-	const right = normalizeLetters(b);
+function getPronunciationLookupKeys(word: string): string[] {
+	const variants = new Set<string>();
+	const pending: string[] = [word.toLowerCase(), normalizeLetters(word)];
 
-	if (left.length < 2 || left.length !== right.length || left === right) {
-		return false;
+	while (pending.length > 0) {
+		const current: string | undefined = pending.pop();
+		if (current === undefined || variants.has(current)) {
+			continue;
+		}
+
+		variants.add(current);
+
+		for (const [pattern, replacement] of UK_TO_US_SPELLING_RULES) {
+			const converted: string = current.replace(pattern, replacement);
+			if (converted !== current) {
+				pending.push(converted);
+			}
+		}
 	}
 
-	return [...left].sort().join('') === [...right].sort().join('');
+	return [...variants];
 }
 
-export function findMatchingRhymeEnding(a: string, b: string): string | null {
+function getPronunciations(word: string): string[] {
+	const pronunciations = new Set<string>();
+
+	for (const key of getPronunciationLookupKeys(word)) {
+		for (const pronunciation of PRONUNCIATIONS_BY_WORD.get(key) ?? []) {
+			pronunciations.add(pronunciation);
+		}
+	}
+
+	return [...pronunciations];
+}
+
+function getRhymingPart(pronunciation: string): string | null {
+	const phonemes = pronunciation.split(' ');
+
+	for (let index = phonemes.length - 1; index >= 0; index -= 1) {
+		if (STRESSED_VOWEL_PATTERN.test(phonemes[index])) {
+			return phonemes.slice(index).join(' ');
+		}
+	}
+
+	return null;
+}
+
+function findMatchingPronunciationRhyme(a: string, b: string): string | null {
+	const leftRhymes = new Set(
+		getPronunciations(a)
+			.map(getRhymingPart)
+			.filter((rhyme): rhyme is string => rhyme !== null)
+	);
+
+	for (const pronunciation of getPronunciations(b)) {
+		const rhyme = getRhymingPart(pronunciation);
+		if (rhyme && leftRhymes.has(rhyme)) {
+			return rhyme;
+		}
+	}
+
+	return null;
+}
+
+function findMatchingMaintainedRhymeEnding(a: string, b: string): string | null {
 	const left = normalizeLetters(a);
 	const right = normalizeLetters(b);
 
@@ -46,6 +138,21 @@ export function findMatchingRhymeEnding(a: string, b: string): string | null {
 	return null;
 }
 
+export function areAnagrams(a: string, b: string): boolean {
+	const left = normalizeLetters(a);
+	const right = normalizeLetters(b);
+
+	if (left.length < 2 || left.length !== right.length || left === right) {
+		return false;
+	}
+
+	return [...left].sort().join('') === [...right].sort().join('');
+}
+
+export function findMatchingRhymeEnding(a: string, b: string): string | null {
+	return findMatchingPronunciationRhyme(a, b) ?? findMatchingMaintainedRhymeEnding(a, b);
+}
+
 export function getCodeLinkVerdict(a: string, b: string): LinkVerdict | null {
 	if (areAnagrams(a, b)) {
 		return {
@@ -59,12 +166,15 @@ export function getCodeLinkVerdict(a: string, b: string): LinkVerdict | null {
 
 	const rhymeEnding = findMatchingRhymeEnding(a, b);
 	if (rhymeEnding) {
+		const usedPronunciationDictionary = rhymeEnding.includes(' ');
 		return {
 			a,
 			b,
 			valid: true,
 			type: 'rhyme',
-			reason: `Both words match the maintained rhyme ending pattern ${rhymeEnding}.`,
+			reason: usedPronunciationDictionary
+				? `Both words share the pronunciation ending ${rhymeEnding}.`
+				: `Both words match the maintained rhyme ending pattern ${rhymeEnding}.`,
 		};
 	}
 
