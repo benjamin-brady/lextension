@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
@@ -21,6 +23,28 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 	afterNavigate(() => {
 		if (!gaMeasurementId || typeof window === 'undefined') return;
 		trackPageView(new URL(window.location.href), gaMeasurementId);
+	});
+
+	// First-load reconciliation: if the SSR pass used UTC (no cookie yet) but the
+	// user's local calendar day differs, the inline app.html script set the cookie
+	// and we re-run loaders so daily routes pick up the local-date puzzle.
+	onMount(() => {
+		try {
+			const d = new Date();
+			const localIso =
+				d.getFullYear() +
+				'-' +
+				String(d.getMonth() + 1).padStart(2, '0') +
+				'-' +
+				String(d.getDate()).padStart(2, '0');
+			const utcIso = d.toISOString().slice(0, 10);
+			const loadedDate = (page.data as { daily?: { date?: string } } | undefined)?.daily?.date;
+			if (loadedDate && loadedDate === utcIso && loadedDate !== localIso) {
+				void invalidateAll();
+			}
+		} catch {
+			// best-effort
+		}
 	});
 
 	$effect(() => {

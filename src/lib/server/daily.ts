@@ -25,6 +25,19 @@ export function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+/**
+ * Resolve the daily puzzle date for a request. Uses the `puzzle_date` cookie
+ * (set client-side to the user's local YYYY-MM-DD) when present and well-formed,
+ * otherwise falls back to UTC. This lets puzzles roll over at midnight local
+ * time for everyone.
+ */
+export function todayForRequest(cookieValue: string | undefined): string {
+  if (typeof cookieValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(cookieValue)) {
+    return cookieValue;
+  }
+  return todayUtc();
+}
+
 export function addDays(isoDate: string, days: number): string {
   const d = new Date(isoDate + 'T00:00:00Z');
   d.setUTCDate(d.getUTCDate() + days);

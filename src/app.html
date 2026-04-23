@@ -21,6 +21,23 @@
 				} catch (e) {}
 			})();
 		</script>
+		<script>
+			// Set puzzle_date cookie to local YYYY-MM-DD before SvelteKit hydrates
+			// so daily-puzzle server loads resolve against the user's local calendar day.
+			(function () {
+				try {
+					var d = new Date();
+					var iso =
+						d.getFullYear() +
+						'-' +
+						String(d.getMonth() + 1).padStart(2, '0') +
+						'-' +
+						String(d.getDate()).padStart(2, '0');
+					document.cookie =
+						'puzzle_date=' + iso + '; Path=/; Max-Age=86400; SameSite=Lax';
+				} catch (e) {}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

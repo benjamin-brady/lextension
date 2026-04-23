@@ -443,7 +443,7 @@
       <p>Fewer steps = higher score. This mode is <strong>much harder</strong> than regular bridging!</p>
 
       <p class="pt-1 font-bold text-(--text) uppercase tracking-wider">Daily rollover</p>
-      <p>A fresh puzzle unlocks at <strong>midnight UTC</strong> every day. Your streak is tracked separately for chain and fib dailies.</p>
+      <p>A fresh puzzle unlocks at <strong>midnight your local time</strong> every day. Your streak is tracked separately for chain and fib dailies.</p>
 
       <p class="pt-1 font-bold text-(--text) uppercase tracking-wider">Ways to link words</p>
       <ul class="list-none pl-0 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
