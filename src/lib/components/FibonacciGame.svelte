@@ -435,12 +435,36 @@
   <!-- How it works -->
   <details class="text-xs text-(--text-muted)">
     <summary class="cursor-pointer font-bold uppercase tracking-wider hover:text-(--text)">How Fibonacci mode works</summary>
-    <div class="mt-2 space-y-1 pl-2">
+    <div class="mt-2 space-y-2 pl-2">
       <p>You start with two seed words: <strong>{startA}</strong> and <strong>{startB}</strong>.</p>
-      <p>Each word you add must have a valid link to <strong>both</strong> of the two words before it — like a Fibonacci sequence where each term depends on the previous two.</p>
+      <p>Each word you add must have a valid link to <strong>both</strong> of the two words before it, like a Fibonacci sequence where each term depends on the previous two.</p>
       <p>Your goal is to reach <strong>{target}</strong>.</p>
-      <p class="mt-1">Example: <strong>Fire, Ice</strong> → you need a word related to both Fire AND Ice, like <em>Burn</em> (fire→burn, ice→burn).</p>
+      <p>Example: <strong>Fire, Ice</strong> → you need a word related to both Fire AND Ice, like <em>Burn</em> (fire→burn, ice→burn).</p>
       <p>Fewer steps = higher score. This mode is <strong>much harder</strong> than regular bridging!</p>
+
+      <p class="pt-1 font-bold text-(--text) uppercase tracking-wider">Daily rollover</p>
+      <p>A fresh puzzle unlocks at <strong>midnight UTC</strong> every day. Your streak is tracked separately for chain and fib dailies.</p>
+
+      <p class="pt-1 font-bold text-(--text) uppercase tracking-wider">Ways to link words</p>
+      <ul class="list-none pl-0 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
+        <li>🧩 Compound (ice → cream)</li>
+        <li>🔄 Synonym (cab → taxi)</li>
+        <li>🎵 Rhyme (cat → hat)</li>
+        <li>⚡ Opposite (hot → cold)</li>
+        <li>👥 Category sibling (dog → cat)</li>
+        <li>🔧 Part / whole (wheel → car)</li>
+        <li>🎭 Object / role (stage → actor)</li>
+        <li>🧱 Material (wood → chair)</li>
+        <li>💪 Verb / object (chop → wood)</li>
+        <li>💬 Collocation (heavy → rain)</li>
+        <li>💥 Cause / effect (rain → flood)</li>
+        <li>🤝 Cultural pair (salt → pepper)</li>
+        <li>🗣️ Slang (buck → dollar)</li>
+        <li>🎯 Double meaning (bar → lawyer)</li>
+        <li>👂 Homophone (flower → flour)</li>
+        <li>📦 Containment (book → library)</li>
+        <li>🔀 Anagram (listen → silent)</li>
+      </ul>
     </div>
   </details>
 </div>
