@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { VALIDATION_PROMPT } from '$lib/validation-prompt';
 import type { LinkVerdict } from '$lib/types';
 import { traceLLMValidation } from '$lib/langfuse';
+import { getCodeLinkVerdict } from '$lib/word-link-validation';
 
 function cacheKey(a: string, b: string): string {
   // Order-dependent: compounds are directional (hot→dog ≠ dog→hot)
@@ -128,6 +129,16 @@ export const POST: RequestHandler = async ({ request, platform }) => {
   }
 
   const kv = platform?.env?.LINK_CACHE;
+
+  const codeVerdict = getCodeLinkVerdict(a, b);
+  if (codeVerdict) {
+    if (kv) {
+      await kv.put(cacheKey(a, b), JSON.stringify(codeVerdict));
+    }
+
+    return json(codeVerdict);
+  }
+
   const apiKey = platform?.env?.OPENROUTER_API_KEY;
 
   if (!apiKey) {
