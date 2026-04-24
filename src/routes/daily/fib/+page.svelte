@@ -9,6 +9,8 @@
 
 <svelte:head>
   <title>Daily Fib: {daily.startA} + {daily.startB} → {daily.target} | Lextension</title>
+  <meta property="og:image" content="https://lextension.net/og-image-fib.png" />
+  <meta name="twitter:image" content="https://lextension.net/og-image-fib.png" />
 </svelte:head>
 
 <div class="grid gap-4">

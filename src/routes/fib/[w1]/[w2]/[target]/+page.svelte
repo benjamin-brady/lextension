@@ -9,6 +9,8 @@
 
 <svelte:head>
   <title>{w1} + {w2} → {target} | Fibonacci | Lextension</title>
+  <meta property="og:image" content="https://lextension.net/og-image-fib.png" />
+  <meta name="twitter:image" content="https://lextension.net/og-image-fib.png" />
 </svelte:head>
 
 <div class="grid gap-4">
