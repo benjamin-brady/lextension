@@ -99,6 +99,8 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 			<nav class="flex items-center gap-3 text-xs text-(--text-muted)">
 				<a class="hover:text-(--accent) transition-colors" href="https://discord.gg/AWfvmFWBcA" target="_blank" rel="noopener noreferrer">Discord</a>
 				<span aria-hidden="true">·</span>
+				<a class="hover:text-(--accent) transition-colors" href="/faq">FAQ</a>
+				<span aria-hidden="true">·</span>
 				<a class="hover:text-(--accent) transition-colors" href="/terms">Terms</a>
 				<span aria-hidden="true">·</span>
 				<a class="hover:text-(--accent) transition-colors" href="/privacy">Privacy</a>
