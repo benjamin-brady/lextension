@@ -137,6 +137,25 @@
     }
   }
 
+  function isTextInputTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' || target.isContentEditable;
+  }
+
+  function handleWindowKeydown(e: KeyboardEvent) {
+    if (game.isComplete || game.isValidating || !inputEl) return;
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key.length !== 1 || isTextInputTarget(e.target)) return;
+
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement !== document.body && activeElement !== inputEl) return;
+
+    e.preventDefault();
+    inputEl.focus();
+    inputValue += e.key;
+  }
+
   function getTypeEmoji(type: string | null): string {
     const map: Record<string, string> = {
       compound: '🧩',
@@ -196,6 +215,8 @@
   }
 </script>
 
+<svelte:window on:keydown={handleWindowKeydown} />
+
 <div class="flex flex-col gap-4">
   <!-- Endpoints -->
   <div class="flex items-center justify-between p-4 border-2 border-(--ink) bg-(--surface)">
@@ -212,7 +233,7 @@
 
   <!-- Chain so far -->
   <div class="flex flex-col gap-1">
-    {#each game.chain as word, i}
+    {#each game.chain as word, i (word)}
       <div class="flex items-center gap-2">
         <span class="w-6 text-center text-xs font-bold text-(--text-muted)">{i + 1}</span>
         <span
