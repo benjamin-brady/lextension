@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { VALIDATION_PROMPT } from '$lib/validation-prompt';
 import type { LinkVerdict } from '$lib/types';
-import { traceLLMValidation } from '$lib/langfuse';
+import { traceLLMValidation, hashUserId, getClientIp } from '$lib/langfuse';
 import { getCodeLinkVerdict } from '$lib/word-link-validation';
 
 function cacheKey(a: string, b: string): string {
@@ -74,7 +74,9 @@ function parseLLMResponse(a: string, b: string, raw: string): LinkVerdict {
 
 const MODEL = 'google/gemini-2.5-flash';
 
-async function validatePairWithLLM(a: string, b: string, apiKey: string): Promise<{ verdict: LinkVerdict; raw: string; prompt: string }> {
+type LLMUsage = { promptTokens?: number; completionTokens?: number; totalTokens?: number };
+
+async function validatePairWithLLM(a: string, b: string, apiKey: string): Promise<{ verdict: LinkVerdict; raw: string; prompt: string; usage: LLMUsage | null }> {
   const prompt = VALIDATION_PROMPT.replaceAll('{a}', a).replaceAll('{b}', b);
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -99,9 +101,17 @@ async function validatePairWithLLM(a: string, b: string, apiKey: string): Promis
 
   const data = (await response.json()) as {
     choices: Array<{ message: { content: string } }>;
+    usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
   };
   const raw = data.choices[0]?.message?.content ?? '';
-  return { verdict: parseLLMResponse(a, b, raw), raw, prompt };
+  const usage = data.usage
+    ? {
+        promptTokens: data.usage.prompt_tokens,
+        completionTokens: data.usage.completion_tokens,
+        totalTokens: data.usage.total_tokens,
+      }
+    : null;
+  return { verdict: parseLLMResponse(a, b, raw), raw, prompt, usage };
 }
 
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -157,7 +167,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
   // Call LLM
   const t0 = Date.now();
-  const { verdict, raw, prompt } = await validatePairWithLLM(a, b, apiKey);
+  const { verdict, raw, prompt, usage } = await validatePairWithLLM(a, b, apiKey);
   const durationMs = Date.now() - t0;
 
   // Cache the result (no expiry — word relationships don't change)
@@ -168,6 +178,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
   // Trace to Langfuse (fire-and-forget)
   const env = platform?.env;
   if (env) {
+    const userId = await hashUserId(getClientIp(request));
     void traceLLMValidation(env, {
       wordA: a,
       wordB: b,
@@ -179,6 +190,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
       model: MODEL,
       cached: false,
       durationMs,
+      userId,
+      usage,
     });
   }
 

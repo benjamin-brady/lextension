@@ -16,6 +16,7 @@ declare global {
 				OPENROUTER_API_KEY?: string;
 				LANGFUSE_PUBLIC_KEY?: string;
 				LANGFUSE_SECRET_KEY?: string;
+				LANGFUSE_BASE_URL?: string;
 				CRON_SECRET?: string;
 			};
 			cf?: {
