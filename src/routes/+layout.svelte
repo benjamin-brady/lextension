@@ -12,6 +12,13 @@
 	let { children } = $props();
 
 	const gaMeasurementId = env.PUBLIC_GA_MEASUREMENT_ID ?? '';
+
+	// Fib routes get the fib-themed OG image; everything else gets the default.
+	const ogImageUrl = $derived.by(() => {
+		const path = page.url?.pathname ?? '';
+		const isFib = path === '/daily/fib' || path.startsWith('/daily/fib/') || path.startsWith('/fib/');
+		return isFib ? 'https://lextension.net/og-image-fib.png' : 'https://lextension.net/og-image.png';
+	});
 	const gaBootstrapScript = gaMeasurementId
 		? `window.dataLayer = window.dataLayer || [];
 function gtag(){window.dataLayer.push(arguments);}
@@ -70,6 +77,8 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 	{/if}
 	<title>Lextension - Word Bridge Puzzle</title>
 	<meta name="description" content="Bridge between two words using word relationships. Fewer hops = higher score!" />
+	<meta property="og:image" content={ogImageUrl} />
+	<meta name="twitter:image" content={ogImageUrl} />
 </svelte:head>
 
 <div class="relative z-10 min-h-dvh flex flex-col items-center text-(--text)">
