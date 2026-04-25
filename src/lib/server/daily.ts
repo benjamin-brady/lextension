@@ -1,6 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { getDb, schema } from './db';
 import { pickChainPuzzle, pickFibPuzzle } from '$lib/seeds';
+import { isRejectedChainPuzzle } from '$lib/daily-chain-catalog';
 
 export type Mode = 'chain' | 'fib';
 
@@ -59,7 +60,21 @@ export async function ensureDaily(d1: D1Database, date: string, mode: Mode): Pro
     .from(schema.dailyPuzzles)
     .where(and(eq(schema.dailyPuzzles.date, date), eq(schema.dailyPuzzles.mode, mode)))
     .limit(1);
-  if (existing.length) return rowToDaily(existing[0]);
+  if (existing.length) {
+    const row = existing[0];
+
+    if (mode === 'chain' && isRejectedChainPuzzle(row.seedA, row.target)) {
+      const { start, end } = pickChainPuzzle(date);
+      await db
+        .update(schema.dailyPuzzles)
+        .set({ seedA: start, seedB: null, target: end })
+        .where(eq(schema.dailyPuzzles.id, row.id));
+
+      return { mode: 'chain', date, start, end };
+    }
+
+    return rowToDaily(row);
+  }
 
   if (mode === 'fib') {
     const { startA, startB, target } = pickFibPuzzle(date);

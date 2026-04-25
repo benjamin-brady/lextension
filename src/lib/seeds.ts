@@ -1,7 +1,13 @@
+import { CHAIN_DAILY_PUZZLES } from './daily-chain-catalog';
+
 /**
  * Daily puzzle seed catalog.
  *
- * Two pools:
+ * Normal-mode dailies are selected from CHAIN_DAILY_PUZZLES, a committed
+ * catalog of vetted pairs with sample routes. The pools below remain for
+ * Fibonacci-mode puzzle selection.
+ *
+ * Two Fibonacci pools:
  *  - `ANCHORS`: versatile words with rich compound/rhyme/cultural networks.
  *    At least one endpoint in every puzzle is drawn from here so players
  *    always have a fertile foothold. Critical for Fibonacci mode where
@@ -74,13 +80,13 @@ function pick<T>(arr: readonly T[], seed: number): T {
 }
 
 /**
- * Deterministically pick a 2-word chain puzzle for a given ISO date.
- * First word is drawn from ANCHORS, second from TARGETS.
+ * Deterministically pick a vetted 2-word chain puzzle for a given ISO date.
+ * Normal-mode dailies come from a committed catalog with sample routes so
+ * known direct-link pairs like Snake → Dragon do not collapse the puzzle.
  */
 export function pickChainPuzzle(isoDate: string): { start: string; end: string } {
-  const h1 = hashString(`chain:${isoDate}:a`);
-  const h2 = hashString(`chain:${isoDate}:b`);
-  return { start: pick(ANCHORS, h1), end: pick(TARGETS, h2) };
+  const puzzle = pick(CHAIN_DAILY_PUZZLES, hashString(`chain:${isoDate}:catalog`));
+  return { start: puzzle.start, end: puzzle.end };
 }
 
 /**
@@ -135,6 +141,16 @@ export const WORD_EMOJIS: Record<string, string> = {
   bow: '🏹', arrow: '➡️', hook: '🪝', line: '📏', net: '🕸️',
   string: '🧵', pine: '🌲', oak: '🌳', grape: '🍇', peach: '🍑',
   lime: '🟢', lemon: '🍋', cherry: '🍒',
+  moss: '🌿', fern: '🌿', ivy: '🍃', emerald: '💚', olive: '🫒',
+  mint: '🌿', jade: '🟩', library: '📚', station: '🚉', museum: '🏛️',
+  theater: '🎭', airport: '✈️', factory: '🏭', plate: '🍽️', bowl: '🥣',
+  harbor: '⚓', anchor: '⚓', island: '🏝️', hail: '🌨️', thunder: '⚡',
+  drizzle: '🌧️', sleet: '🌨️', downpour: '🌧️', orchestra: '🎼', concert: '🎶',
+  news: '📰', note: '📝', tissue: '🧻', carbon: '◼️', graph: '📈', wax: '🕯️',
+  sheriff: '⭐', ranch: '🐎', saddle: '🐎', rodeo: '🤠', wagon: '🛒',
+  lasso: '➰', outlaw: '🤠', tiger: '🐯', lion: '🦁', fox: '🦊', paw: '🐾',
+  print: '🖨️', screen: '🖥️', camera: '📷', printer: '🖨️', router: '📡',
+  monitor: '🖥️', laptop: '💻', microchip: '🧩', sound: '🔊', trail: '🥾',
   // targets
   lawyer: '👨‍⚖️', pizza: '🍕', shakespeare: '🎭', banana: '🍌',
   spaceship: '🚀', penguin: '🐧', guitar: '🎸', umbrella: '☂️',

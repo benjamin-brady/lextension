@@ -2,8 +2,8 @@
   import LextensionGame from '$lib/components/LextensionGame.svelte';
   import { page } from '$app/state';
 
-  const word1 = $derived(decodeURIComponent(page.params.word1));
-  const word2 = $derived(decodeURIComponent(page.params.word2));
+  const word1 = $derived(decodeURIComponent(page.params.word1 ?? ''));
+  const word2 = $derived(decodeURIComponent(page.params.word2 ?? ''));
 </script>
 
 <svelte:head>

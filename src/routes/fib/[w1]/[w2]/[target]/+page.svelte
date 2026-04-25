@@ -2,9 +2,9 @@
   import FibonacciGame from "$lib/components/FibonacciGame.svelte";
   import { page } from "$app/state";
 
-  const w1 = $derived(decodeURIComponent(page.params.w1));
-  const w2 = $derived(decodeURIComponent(page.params.w2));
-  const target = $derived(decodeURIComponent(page.params.target));
+  const w1 = $derived(decodeURIComponent(page.params.w1 ?? ''));
+  const w2 = $derived(decodeURIComponent(page.params.w2 ?? ''));
+  const target = $derived(decodeURIComponent(page.params.target ?? ''));
 </script>
 
 <svelte:head>
