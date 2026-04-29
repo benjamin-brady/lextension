@@ -114,7 +114,7 @@ gtag('config', ${JSON.stringify(gaMeasurementId)}, { send_page_view: false });`
 				<span aria-hidden="true">·</span>
 				<a class="hover:text-(--accent) transition-colors" href="/privacy">Privacy</a>
 			</nav>
-			<p class="text-[10px] text-(--text-muted)">Made with ☕ by <a class="hover:text-(--accent) transition-colors" href="https://benjamin-brady.github.io/" target="_blank" rel="noopener noreferrer">Ben Brady</a></p>
+			<p class="text-[10px] text-(--text-muted)">Made with ☕ by <a class="hover:text-(--accent) transition-colors" href="https://www.linkedin.com/in/benj-brady/" target="_blank" rel="noopener noreferrer">Ben Brady</a></p>
 		</div>
 	</footer>
 </div>

@@ -60,7 +60,7 @@
 		<div class="grid gap-2">
 			<h2 class="font-display text-lg font-bold">Who made this?</h2>
 			<p class="text-sm text-(--text-muted) leading-relaxed">
-				Lextension is made by <a class="text-(--text) underline hover:text-(--accent) transition-colors" href="https://benjamin-brady.github.io/" target="_blank" rel="noopener noreferrer">Ben Brady</a>. You can find his other games there too.
+				Lextension is made by <a class="text-(--text) underline hover:text-(--accent) transition-colors" href="https://www.linkedin.com/in/benj-brady/" target="_blank" rel="noopener noreferrer">Ben Brady</a>.
 			</p>
 		</div>
 
