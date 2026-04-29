@@ -25,7 +25,7 @@ type Manifest = {
 	games: PromoGame[];
 };
 
-const MANIFEST_URL = 'https://benjamin-brady.github.io/games.json';
+const MANIFEST_URL = 'https://games-manifest.as9aisuhdn.workers.dev/games.json';
 const CACHE_KEY = 'lextension:cross-promo:v1';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 const SELF_SLUG = 'lextension';
