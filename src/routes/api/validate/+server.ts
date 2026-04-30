@@ -4,11 +4,7 @@ import { VALIDATION_PROMPT } from '$lib/validation-prompt';
 import type { LinkVerdict } from '$lib/types';
 import { traceLLMValidation, hashUserId, getClientIp } from '$lib/langfuse';
 import { getCodeLinkVerdict } from '$lib/word-link-validation';
-
-function cacheKey(a: string, b: string): string {
-  // Order-dependent: compounds are directional (hot→dog ≠ dog→hot)
-  return `lext:${a.toLowerCase().trim()}:${b.toLowerCase().trim()}`;
-}
+import { getValidationCacheKey, reframeVerdictForPair } from '$lib/validation-cache';
 
 const VALID_TYPES = [
   'compound', 'synonym', 'rhyme', 'opposite', 'category-sibling',
@@ -139,11 +135,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
   }
 
   const kv = platform?.env?.LINK_CACHE;
+  const key = getValidationCacheKey(a, b);
 
   const codeVerdict = getCodeLinkVerdict(a, b);
   if (codeVerdict) {
     if (kv) {
-      await kv.put(cacheKey(a, b), JSON.stringify(codeVerdict));
+      await kv.put(key, JSON.stringify(codeVerdict));
     }
 
     return json(codeVerdict);
@@ -155,13 +152,11 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     return json({ error: 'AI validation not configured' }, { status: 503 });
   }
 
-  const key = cacheKey(a, b);
-
   // Check KV cache first
   if (kv) {
     const cached = await kv.get(key, 'json');
     if (cached) {
-      return json(cached as LinkVerdict);
+      return json(reframeVerdictForPair(cached as LinkVerdict, a, b));
     }
   }
 

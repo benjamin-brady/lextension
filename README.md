@@ -5,14 +5,14 @@ Lextension is a Fibonacci word-bridge game. You start with two seed words and bu
 ## How it works
 
 1. You're given two **seed words** and a **target word**.
-2. Each word you play must have a valid relationship with the two words before it (compound, rhyme, category, opposite, etc.).
+2. Each word you play must have a valid relationship with the two words before it (compound, rhyme, category, opposite, etc.). Compound links work in either order: `hot` + `dog` counts whether played as `hot` → `dog` or `dog` → `hot`.
 3. Word relationships are validated in real-time by an LLM judge.
 4. Reach the target word to win — fewer hops = higher score.
 
 ## Tech stack
 
 - **SvelteKit** on **Cloudflare Workers**
-- **Cloudflare KV** for caching validated word pairs
+- **Cloudflare KV** for caching validated word pairs in either order
 - **OpenRouter** (Gemini 2.5 Flash) for real-time word-relationship validation
 - **Bun** for package management and scripts
 

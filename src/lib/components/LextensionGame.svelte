@@ -375,7 +375,7 @@
       <p>Bridge from <strong>{start}</strong> to <strong>{end}</strong> using word relationships.</p>
       <p>Each word you add must have a direct link to the previous word:</p>
       <ul class="list-disc pl-4 space-y-0.5">
-        <li>🧩 Compound words (ice → cream)</li>
+        <li>🧩 Compound words in either order (ice ↔ cream)</li>
         <li>🔄 Synonyms (cab → taxi)</li>
         <li>🎵 Rhymes: exact ending sounds, spelling variants, and some UK/US variants (cat → hat, tail → tale, litre → cheater)</li>
         <li>⚡ Opposites (hot → cold)</li>

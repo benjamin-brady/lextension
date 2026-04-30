@@ -259,7 +259,7 @@
 
   <!-- Chain -->
   <div class="flex flex-col gap-1">
-    {#each game.chain as word, i}
+    {#each game.chain as word, i (word)}
       <div class="flex items-center gap-2">
         <span class="w-6 text-center text-xs font-bold text-(--text-muted)">{i + 1}</span>
         <span
@@ -447,7 +447,7 @@
 
       <p class="pt-1 font-bold text-(--text) uppercase tracking-wider">Ways to link words</p>
       <ul class="list-none pl-0 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
-        <li>🧩 Compound (ice → cream)</li>
+        <li>🧩 Compound either way (ice ↔ cream)</li>
         <li>🔄 Synonym (cab → taxi)</li>
         <li>🎵 Rhyme (cat → hat)</li>
         <li>⚡ Opposite (hot → cold)</li>
