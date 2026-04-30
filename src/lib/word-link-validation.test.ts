@@ -24,6 +24,30 @@ const RHYME_ENDING_NULL_CASES = [
 
 const VERDICT_CASES = [
 	{
+		name: 'returns a kangaroo verdict for a curated joey synonym pair',
+		left: 'alone',
+		right: 'lone',
+		expected: {
+			a: 'alone',
+			b: 'lone',
+			valid: true,
+			type: 'kangaroo',
+			reason: 'Lone is a joey synonym whose letters appear in order inside alone.',
+		},
+	},
+	{
+		name: 'returns a kangaroo verdict when the joey word is entered first',
+		left: 'stun',
+		right: 'astound',
+		expected: {
+			a: 'stun',
+			b: 'astound',
+			valid: true,
+			type: 'kangaroo',
+			reason: 'Stun is a joey synonym whose letters appear in order inside astound.',
+		},
+	},
+	{
 		name: 'returns an anagram verdict without the LLM',
 		left: 'listen',
 		right: 'silent',
@@ -88,6 +112,7 @@ const VERDICT_CASES = [
 const NULL_VERDICT_CASES = [
 	{ name: 'returns null when code checks cannot decide the link', left: 'stone', right: 'cloud' },
 	{ name: 'does not return a rhyme verdict for queen and regime', left: 'queen', right: 'regime' },
+	{ name: 'does not accept structural kangaroo pairs without a curated synonym', left: 'cart', right: 'cat' },
 ] as const;
 
 describe('areAnagrams', () => {

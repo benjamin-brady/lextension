@@ -159,6 +159,7 @@
   function getTypeEmoji(type: string | null): string {
     const map: Record<string, string> = {
       compound: '🧩',
+      kangaroo: '🦘',
       synonym: '🔄',
       rhyme: '🎵',
       opposite: '⚡',

@@ -15,6 +15,7 @@ export interface ChainState {
 
 export const RELATION_TYPES = [
   'compound',
+  'kangaroo',
   'synonym',
   'rhyme',
   'opposite',

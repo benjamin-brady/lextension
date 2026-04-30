@@ -17,14 +17,14 @@
 		<div class="grid gap-2">
 			<h2 class="font-display text-lg font-bold">What counts as a valid link?</h2>
 			<p class="text-sm text-(--text-muted) leading-relaxed">
-				Two words are linked if they share a recognizable relationship. That includes compound words in either order (hot + dog works both ways), synonyms, opposites, rhymes, anagrams, homophones, category siblings (cat + dog), part-whole (wheel + car), and more. If you can explain the connection, there's a good chance it'll count.
+				Two words are linked if they share a recognizable relationship. That includes compound words in either order (hot + dog works both ways), kangaroo words (astound + stun), synonyms, opposites, rhymes, anagrams, homophones, category siblings (cat + dog), part-whole (wheel + car), and more. If you can explain the connection, there's a good chance it'll count.
 			</p>
 		</div>
 
 		<div class="grid gap-2">
 			<h2 class="font-display text-lg font-bold">How does validation work?</h2>
 			<p class="text-sm text-(--text-muted) leading-relaxed">
-				Some link types are checked instantly in your browser: anagrams are detected by comparing sorted letters, and rhymes are matched using the CMU Pronouncing Dictionary (a phonetic dictionary used in speech research). Everything else is validated by an AI model. Results are cached by word pair, so reversing the same two words won't need a separate check.
+				Some link types are checked instantly in your browser: anagrams are detected by comparing sorted letters, known kangaroo word pairs are matched by their joey letters, and rhymes are matched using the CMU Pronouncing Dictionary (a phonetic dictionary used in speech research). Everything else is validated by an AI model. Results are cached by word pair, so reversing the same two words won't need a separate check.
 			</p>
 		</div>
 

@@ -13,6 +13,14 @@ export const RHYME_ENDING_GROUPS = [
 	['oon'],
 ] as const;
 
+const KANGAROO_PAIRS = [
+	{ host: 'alone', joey: 'lone' },
+	{ host: 'astound', joey: 'stun' },
+	{ host: 'observe', joey: 'see' },
+	{ host: 'encourage', joey: 'urge' },
+	{ host: 'masculine', joey: 'male' },
+] as const;
+
 const PRONUNCIATION_VARIANT_SUFFIX = /\(\d+\)$/;
 const STRESSED_VOWEL_PATTERN = /[12]$/;
 const UK_TO_US_SPELLING_RULES: ReadonlyArray<readonly [RegExp, string]> = [
@@ -53,6 +61,43 @@ const PRONUNCIATIONS_BY_WORD = Object.entries(dictionary).reduce<Map<string, str
 
 function normalizeLetters(word: string): string {
 	return word.toLowerCase().replace(/[^a-z]/g, '');
+}
+
+export function containsLettersInOrder(host: string, joey: string): boolean {
+	const normalizedHost = normalizeLetters(host);
+	const normalizedJoey = normalizeLetters(joey);
+
+	if (normalizedHost.length <= normalizedJoey.length || normalizedJoey.length < 2) {
+		return false;
+	}
+
+	let joeyIndex = 0;
+	for (const letter of normalizedHost) {
+		if (letter === normalizedJoey[joeyIndex]) {
+			joeyIndex += 1;
+			if (joeyIndex === normalizedJoey.length) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+function findCuratedKangarooPair(a: string, b: string): { host: string; joey: string } | null {
+	const left = normalizeLetters(a);
+	const right = normalizeLetters(b);
+
+	for (const pair of KANGAROO_PAIRS) {
+		if (
+			((left === pair.host && right === pair.joey) || (left === pair.joey && right === pair.host)) &&
+			containsLettersInOrder(pair.host, pair.joey)
+		) {
+			return pair;
+		}
+	}
+
+	return null;
 }
 
 function getPronunciationLookupKeys(word: string): string[] {
@@ -154,6 +199,19 @@ export function findMatchingRhymeEnding(a: string, b: string): string | null {
 }
 
 export function getCodeLinkVerdict(a: string, b: string): LinkVerdict | null {
+	const kangarooPair = findCuratedKangarooPair(a, b);
+	if (kangarooPair) {
+		const host = kangarooPair.host;
+		const joey = kangarooPair.joey;
+		return {
+			a,
+			b,
+			valid: true,
+			type: 'kangaroo',
+			reason: `${joey[0].toUpperCase()}${joey.slice(1)} is a joey synonym whose letters appear in order inside ${host}.`,
+		};
+	}
+
 	if (areAnagrams(a, b)) {
 		return {
 			a,
