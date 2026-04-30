@@ -6,6 +6,8 @@
   import { fibEmojiSummary } from '$lib/share';
   import { recordCompletion, type DailyMode } from '$lib/streak';
   import { saveFibGame, loadFibGame } from '$lib/game-persist';
+  import LinkTypeHelp from '$lib/components/LinkTypeHelp.svelte';
+  import { getRelationTypeEmoji } from '$lib/link-type-help';
 
   let {
     startA,
@@ -177,14 +179,7 @@
   }
 
   function getTypeEmoji(type: string | null): string {
-    const map: Record<string, string> = {
-      compound: '🧩', synonym: '🔄', rhyme: '🎵', opposite: '⚡',
-      'category-sibling': '👥', 'part-whole': '🔧', 'object-role': '🎭',
-      material: '🧱', 'verb-object': '💪', collocation: '💬',
-      'cause-effect': '💥', 'cultural-pair': '🤝', slang: '🗣️',
-      'double-meaning': '🎯', homophone: '👂', containment: '📦', anagram: '🔀',
-    };
-    return map[type ?? ''] ?? '✅';
+    return getRelationTypeEmoji(type);
   }
 
   function getScoreInfo() {
@@ -446,25 +441,7 @@
       <p>A fresh puzzle unlocks at <strong>midnight your local time</strong> every day. Your streak is tracked separately for chain and fib dailies.</p>
 
       <p class="pt-1 font-bold text-(--text) uppercase tracking-wider">Ways to link words</p>
-      <ul class="list-none pl-0 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
-        <li>🧩 Compound either way (ice ↔ cream)</li>
-        <li>🔄 Synonym (cab → taxi)</li>
-        <li>🎵 Rhyme (cat → hat)</li>
-        <li>⚡ Opposite (hot → cold)</li>
-        <li>👥 Category sibling (dog → cat)</li>
-        <li>🔧 Part / whole (wheel → car)</li>
-        <li>🎭 Object / role (stage → actor)</li>
-        <li>🧱 Material (wood → chair)</li>
-        <li>💪 Verb / object (chop → wood)</li>
-        <li>💬 Collocation (heavy → rain)</li>
-        <li>💥 Cause / effect (rain → flood)</li>
-        <li>🤝 Cultural pair (salt → pepper)</li>
-        <li>🗣️ Slang (buck → dollar)</li>
-        <li>🎯 Double meaning (bar → lawyer)</li>
-        <li>👂 Homophone (flower → flour)</li>
-        <li>📦 Containment (book → library)</li>
-        <li>🔀 Anagram (listen → silent)</li>
-      </ul>
+      <LinkTypeHelp />
     </div>
   </details>
 </div>

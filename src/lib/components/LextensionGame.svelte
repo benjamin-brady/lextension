@@ -6,6 +6,8 @@
   import { recordCompletion, type DailyMode } from '$lib/streak';
   import { saveChainGame, loadChainGame } from '$lib/game-persist';
   import CrossPromoCard from '$lib/components/CrossPromoCard.svelte';
+  import LinkTypeHelp from '$lib/components/LinkTypeHelp.svelte';
+  import { getRelationTypeEmoji } from '$lib/link-type-help';
 
   let {
     start,
@@ -157,27 +159,7 @@
   }
 
   function getTypeEmoji(type: string | null): string {
-    const map: Record<string, string> = {
-      compound: '🧩',
-      kangaroo: '🦘',
-      synonym: '🔄',
-      rhyme: '🎵',
-      opposite: '⚡',
-      'category-sibling': '👥',
-      'part-whole': '🔧',
-      'object-role': '🎭',
-      material: '🧱',
-      'verb-object': '💪',
-      collocation: '💬',
-      'cause-effect': '💥',
-      'cultural-pair': '🤝',
-      slang: '🗣️',
-      'double-meaning': '🎯',
-      homophone: '👂',
-      containment: '📦',
-      anagram: '🔀',
-    };
-    return map[type ?? ''] ?? '✅';
+    return getRelationTypeEmoji(type);
   }
 
   function shareResult() {
@@ -375,16 +357,7 @@
     <div class="mt-2 space-y-1 pl-2">
       <p>Bridge from <strong>{start}</strong> to <strong>{end}</strong> using word relationships.</p>
       <p>Each word you add must have a direct link to the previous word:</p>
-      <ul class="list-disc pl-4 space-y-0.5">
-        <li>🧩 Compound words in either order (ice ↔ cream)</li>
-        <li>🔄 Synonyms (cab → taxi)</li>
-        <li>🎵 Rhymes: exact ending sounds, spelling variants, and some UK/US variants (cat → hat, tail → tale, litre → cheater)</li>
-        <li>⚡ Opposites (hot → cold)</li>
-        <li>🤝 Cultural pairs (salt → pepper)</li>
-        <li>💪 Verb-object (chop → wood)</li>
-        <li>🎯 Double meaning (bar → lawyer)</li>
-        <li>...and more!</li>
-      </ul>
+      <LinkTypeHelp />
       <p>Rhymes are checked by pronunciation first. Near-rhymes and loose vowel matches do not count.</p>
       <p>Fewer hops = higher score. <strong>1 hop = Genius!</strong></p>
     </div>
